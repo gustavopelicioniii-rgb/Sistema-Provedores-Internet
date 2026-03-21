@@ -1,4 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { GlassCard } from "@/components/GlassCard";
+import { PageWrapper } from "@/components/PageWrapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Building2, Upload, Plus, UserPlus } from "lucide-react";
 
 const users = [
   { name: "Admin Principal", email: "admin@provedor.com", role: "Admin", access: "Acesso total" },
@@ -17,14 +20,47 @@ const users = [
   { name: "Mariana Atendimento", email: "mariana@provedor.com", role: "Operador", access: "Clientes, Tickets" },
 ];
 
-const integrations = [
-  { name: "Mikrotik", description: "Gerenciamento de roteadores e autenticação PPPoE", connected: true },
-  { name: "Huawei OLT", description: "Gerenciamento de OLTs e provisionamento GPON", connected: true },
-  { name: "Asaas", description: "Gateway de pagamentos e emissão de boletos", connected: true },
-  { name: "Gerencianet", description: "Pagamentos via PIX e boleto bancário", connected: false },
-  { name: "WhatsApp API", description: "Envio de mensagens automáticas via WhatsApp Business", connected: true },
-  { name: "API NF-e", description: "Emissão automática de notas fiscais eletrônicas", connected: false },
-  { name: "ANATEL/SCM", description: "Consulta e conformidade regulatória", connected: false },
+const integrationCategories = [
+  {
+    label: "Rede",
+    items: [
+      { name: "Mikrotik", description: "Gerenciamento de roteadores e autenticação PPPoE", connected: true },
+      { name: "Huawei OLT", description: "Gerenciamento de OLTs e provisionamento GPON", connected: true },
+      { name: "ZTE", description: "OLTs ZTE e gerenciamento GPON", connected: false },
+      { name: "Datacom", description: "Switches e OLTs Datacom", connected: false },
+    ],
+  },
+  {
+    label: "Financeiro",
+    items: [
+      { name: "Asaas", description: "Gateway de pagamentos e emissão de boletos", connected: true },
+      { name: "Gerencianet/Efí", description: "Pagamentos via PIX e boleto bancário", connected: false },
+      { name: "Banco Inter", description: "Conta digital e cobranças", connected: false },
+      { name: "Sicredi", description: "Integração bancária cooperativa", connected: false },
+    ],
+  },
+  {
+    label: "Comunicação",
+    items: [
+      { name: "WhatsApp Business API", description: "Envio de mensagens automáticas via WhatsApp", connected: true },
+      { name: "SMS (Zenvia)", description: "Envio de SMS em massa", connected: false },
+      { name: "Email (SMTP)", description: "Envio de emails transacionais", connected: true },
+    ],
+  },
+  {
+    label: "Fiscal",
+    items: [
+      { name: "NFe.io", description: "Emissão automática de NF-e", connected: false },
+      { name: "Focus NFe", description: "Plataforma de emissão fiscal", connected: false },
+      { name: "Sefaz", description: "Comunicação direta com Sefaz", connected: false },
+    ],
+  },
+  {
+    label: "Regulatório",
+    items: [
+      { name: "ANATEL/SCM", description: "Consulta e conformidade regulatória", connected: false },
+    ],
+  },
 ];
 
 const notifEvents = [
@@ -38,110 +74,164 @@ const notifEvents = [
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="empresa">
-        <TabsList>
-          <TabsTrigger value="empresa">Empresa</TabsTrigger>
-          <TabsTrigger value="usuarios">Usuários</TabsTrigger>
-          <TabsTrigger value="integracoes">Integrações</TabsTrigger>
-          <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
-        </TabsList>
+    <PageWrapper>
+      <div className="space-y-6">
+        <Tabs defaultValue="empresa">
+          <TabsList className="glass-card p-1">
+            <TabsTrigger value="empresa">Empresa</TabsTrigger>
+            <TabsTrigger value="usuarios">Usuários</TabsTrigger>
+            <TabsTrigger value="integracoes">Integrações</TabsTrigger>
+            <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="empresa" className="mt-4">
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Building2 className="h-8 w-8 text-primary" />
-                </div>
-                <Button variant="outline" size="sm"><Upload className="h-4 w-4 mr-2" />Enviar logo</Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Nome da empresa</Label><Input defaultValue="NetFibra Telecom LTDA" /></div>
-                <div className="space-y-2"><Label>CNPJ</Label><Input defaultValue="12.345.678/0001-90" /></div>
-                <div className="space-y-2"><Label>Endereço</Label><Input defaultValue="Av. Paulista, 1000 - São Paulo, SP" /></div>
-                <div className="space-y-2"><Label>Telefone</Label><Input defaultValue="(11) 3456-7890" /></div>
-              </div>
-              <Button>Salvar alterações</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="usuarios" className="mt-4">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Cargo</TableHead>
-                    <TableHead>Acesso</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((u) => (
-                    <TableRow key={u.email}>
-                      <TableCell className="font-medium">{u.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{u.email}</TableCell>
-                      <TableCell><Badge variant="outline">{u.role}</Badge></TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{u.access}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="integracoes" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {integrations.map((integ) => (
-              <Card key={integ.name}>
-                <CardContent className="p-5 flex items-center justify-between">
+          <TabsContent value="empresa" className="mt-4">
+            <GlassCard>
+              <div className="p-6 space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.1)' }}>
+                    <Building2 style={{ width: 32, height: 32, color: '#2563EB' }} />
+                  </div>
                   <div>
-                    <h4 className="font-semibold">{integ.name}</h4>
-                    <p className="text-sm text-muted-foreground">{integ.description}</p>
+                    <Button variant="outline" size="sm" style={{ borderRadius: 10 }}><Upload className="h-4 w-4 mr-2" />Enviar logo</Button>
+                    <p className="text-[10px] text-muted-foreground mt-1">PNG ou JPG, máximo 2MB</p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={integ.connected ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
-                      {integ.connected ? "Conectado" : "Desconectado"}
-                    </Badge>
-                    <Switch checked={integ.connected} />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label>Nome da empresa</Label><Input defaultValue="NetFibra Telecom LTDA" style={{ borderRadius: 10 }} /></div>
+                  <div className="space-y-2"><Label>CNPJ</Label><Input defaultValue="12.345.678/0001-90" style={{ borderRadius: 10 }} /></div>
+                  <div className="space-y-2"><Label>Endereço</Label><Input defaultValue="Av. Paulista, 1000 - São Paulo, SP" style={{ borderRadius: 10 }} /></div>
+                  <div className="space-y-2"><Label>Telefone</Label><Input defaultValue="(11) 3456-7890" style={{ borderRadius: 10 }} /></div>
+                </div>
+                <Button style={{ borderRadius: 10 }}>Salvar alterações</Button>
+              </div>
+            </GlassCard>
+          </TabsContent>
 
-        <TabsContent value="notificacoes" className="mt-4">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Evento</TableHead>
-                    <TableHead className="text-center">Email</TableHead>
-                    <TableHead className="text-center">WhatsApp</TableHead>
-                    <TableHead className="text-center">SMS</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {notifEvents.map((n) => (
-                    <TableRow key={n.event}>
-                      <TableCell className="font-medium">{n.event}</TableCell>
-                      <TableCell className="text-center"><Switch checked={n.email} /></TableCell>
-                      <TableCell className="text-center"><Switch checked={n.whatsapp} /></TableCell>
-                      <TableCell className="text-center"><Switch checked={n.sms} /></TableCell>
+          <TabsContent value="usuarios" className="mt-4 space-y-4">
+            <div className="flex justify-end">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button style={{ borderRadius: 10 }}><UserPlus className="h-4 w-4 mr-2" />Convidar usuário</Button>
+                </DialogTrigger>
+                <DialogContent className="glass-card border-none">
+                  <DialogHeader><DialogTitle>Convidar Usuário</DialogTitle></DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="space-y-2"><Label>Email</Label><Input type="email" placeholder="email@provedor.com" style={{ borderRadius: 10 }} /></div>
+                    <div className="space-y-2">
+                      <Label>Cargo / Permissão</Label>
+                      <Select>
+                        <SelectTrigger style={{ borderRadius: 10 }}><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="operador">Operador</SelectItem>
+                          <SelectItem value="financeiro">Financeiro</SelectItem>
+                          <SelectItem value="suporte">Suporte</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button className="w-full" style={{ borderRadius: 10 }}>Enviar convite</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <GlassCard>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-none">
+                      <TableHead className="glass-table-header">Nome</TableHead>
+                      <TableHead className="glass-table-header">Email</TableHead>
+                      <TableHead className="glass-table-header">Cargo</TableHead>
+                      <TableHead className="glass-table-header">Acesso</TableHead>
                     </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((u) => (
+                      <TableRow key={u.email} className="glass-table-row border-none">
+                        <TableCell className="font-medium text-sm">{u.name}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">{u.email}</TableCell>
+                        <TableCell>
+                          <span className="px-2.5 py-0.5 text-xs font-medium" style={{ background: 'rgba(59,130,246,0.1)', color: '#2563EB', borderRadius: 9999 }}>
+                            {u.role}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{u.access}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </GlassCard>
+          </TabsContent>
+
+          <TabsContent value="integracoes" className="mt-4 space-y-6">
+            {integrationCategories.map((cat) => (
+              <div key={cat.label}>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{cat.label}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {cat.items.map((integ) => (
+                    <GlassCard key={integ.name} hover>
+                      <div className="p-5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: integ.connected ? 'rgba(16,185,129,0.1)' : 'rgba(0,0,0,0.03)' }}>
+                            <span className="text-xs font-bold" style={{ color: integ.connected ? '#10B981' : '#94A3B8' }}>
+                              {integ.name.slice(0, 2).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold">{integ.name}</h4>
+                            <p className="text-xs text-muted-foreground">{integ.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <span
+                            className="px-2.5 py-0.5 text-xs font-medium"
+                            style={{
+                              background: integ.connected ? '#ECFDF5' : '#F1F5F9',
+                              color: integ.connected ? '#059669' : '#64748B',
+                              borderRadius: 9999,
+                            }}
+                          >
+                            {integ.connected ? "Conectado" : "Desconectado"}
+                          </span>
+                          <Button variant="outline" size="sm" style={{ borderRadius: 10 }}>Configurar</Button>
+                        </div>
+                      </div>
+                    </GlassCard>
                   ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                </div>
+              </div>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="notificacoes" className="mt-4">
+            <GlassCard>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-none">
+                      <TableHead className="glass-table-header">Evento</TableHead>
+                      <TableHead className="glass-table-header text-center">Email</TableHead>
+                      <TableHead className="glass-table-header text-center">WhatsApp</TableHead>
+                      <TableHead className="glass-table-header text-center">SMS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {notifEvents.map((n) => (
+                      <TableRow key={n.event} className="glass-table-row border-none">
+                        <TableCell className="font-medium text-sm">{n.event}</TableCell>
+                        <TableCell className="text-center"><Switch checked={n.email} /></TableCell>
+                        <TableCell className="text-center"><Switch checked={n.whatsapp} /></TableCell>
+                        <TableCell className="text-center"><Switch checked={n.sms} /></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </GlassCard>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </PageWrapper>
   );
 }
