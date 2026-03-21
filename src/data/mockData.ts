@@ -38,27 +38,27 @@ export const mockBills = [
 ];
 
 export const mockNFs = [
-  { id: "NF-00142", client: "Tech Solutions LTDA", amount: 399.90, issueDate: "15/03/2026", status: "emitida" as const },
-  { id: "NF-00141", client: "Clínica Bem Estar", amount: 399.90, issueDate: "15/03/2026", status: "emitida" as const },
-  { id: "NF-00140", client: "Carlos Alberto Silva", amount: 99.90, issueDate: "15/03/2026", status: "emitida" as const },
-  { id: "NF-00139", client: "Restaurante Sabor & Cia", amount: 149.90, issueDate: "14/03/2026", status: "emitida" as const },
-  { id: "NF-00138", client: "João Pedro Costa", amount: 99.90, issueDate: "14/03/2026", status: "emitida" as const },
-  { id: "NF-00137", client: "Maria Fernanda Oliveira", amount: 149.90, issueDate: "12/03/2026", status: "cancelada" as const },
-  { id: "NF-00136", client: "Roberto Almeida", amount: 199.90, issueDate: "10/03/2026", status: "emitida" as const },
-  { id: "NF-00135", client: "Fernanda Lima", amount: 99.90, issueDate: "01/12/2025", status: "cancelada" as const },
+  { id: "NF-00142", client: "Tech Solutions LTDA", amount: 399.90, issueDate: "15/03/2026", status: "emitida" as const, serie: "001" },
+  { id: "NF-00141", client: "Clínica Bem Estar", amount: 399.90, issueDate: "15/03/2026", status: "emitida" as const, serie: "001" },
+  { id: "NF-00140", client: "Carlos Alberto Silva", amount: 99.90, issueDate: "15/03/2026", status: "emitida" as const, serie: "001" },
+  { id: "NF-00139", client: "Restaurante Sabor & Cia", amount: 149.90, issueDate: "14/03/2026", status: "emitida" as const, serie: "001" },
+  { id: "NF-00138", client: "João Pedro Costa", amount: 99.90, issueDate: "14/03/2026", status: "emitida" as const, serie: "001" },
+  { id: "NF-00137", client: "Maria Fernanda Oliveira", amount: 149.90, issueDate: "12/03/2026", status: "cancelada" as const, serie: "001" },
+  { id: "NF-00136", client: "Roberto Almeida", amount: 199.90, issueDate: "10/03/2026", status: "emitida" as const, serie: "001" },
+  { id: "NF-00135", client: "Fernanda Lima", amount: 99.90, issueDate: "01/12/2025", status: "cancelada" as const, serie: "001" },
 ];
 
 export const mockTickets = [
-  { id: "TK-1042", client: "Carlos Alberto Silva", subject: "Lentidão na conexão", priority: "alta" as const, status: "aberto" as const, assignee: "Lucas Técnico", date: "21/03/2026" },
-  { id: "TK-1041", client: "Tech Solutions LTDA", subject: "Queda intermitente", priority: "crítica" as const, status: "em andamento" as const, assignee: "Rafael Técnico", date: "20/03/2026" },
-  { id: "TK-1040", client: "Maria Fernanda Oliveira", subject: "Troca de roteador", priority: "média" as const, status: "aberto" as const, assignee: "Lucas Técnico", date: "20/03/2026" },
-  { id: "TK-1039", client: "Restaurante Sabor & Cia", subject: "Instalação ponto extra", priority: "baixa" as const, status: "resolvido" as const, assignee: "André Técnico", date: "19/03/2026" },
-  { id: "TK-1038", client: "Roberto Almeida", subject: "Sem conexão", priority: "alta" as const, status: "em andamento" as const, assignee: "Rafael Técnico", date: "19/03/2026" },
-  { id: "TK-1037", client: "Clínica Bem Estar", subject: "Upgrade de plano", priority: "baixa" as const, status: "resolvido" as const, assignee: "Lucas Técnico", date: "18/03/2026" },
-  { id: "TK-1036", client: "João Pedro Costa", subject: "Configuração Wi-Fi", priority: "média" as const, status: "aberto" as const, assignee: "André Técnico", date: "18/03/2026" },
-  { id: "TK-1035", client: "Luciana Martins", subject: "Reativação de serviço", priority: "média" as const, status: "aberto" as const, assignee: "Lucas Técnico", date: "17/03/2026" },
-  { id: "TK-1034", client: "Ana Paula Santos", subject: "Segunda via de boleto", priority: "baixa" as const, status: "resolvido" as const, assignee: "André Técnico", date: "17/03/2026" },
-  { id: "TK-1033", client: "Fernanda Lima", subject: "Cancelamento", priority: "média" as const, status: "resolvido" as const, assignee: "Rafael Técnico", date: "16/03/2026" },
+  { id: "TK-1042", client: "Carlos Alberto Silva", subject: "Lentidão na conexão", priority: "alta" as const, status: "aberto" as const, assignee: "Lucas Técnico", date: "21/03/2026", timeAgo: "há 2h" },
+  { id: "TK-1041", client: "Tech Solutions LTDA", subject: "Queda intermitente", priority: "crítica" as const, status: "em andamento" as const, assignee: "Rafael Técnico", date: "20/03/2026", timeAgo: "há 1 dia" },
+  { id: "TK-1040", client: "Maria Fernanda Oliveira", subject: "Troca de roteador", priority: "média" as const, status: "aberto" as const, assignee: "Lucas Técnico", date: "20/03/2026", timeAgo: "há 1 dia" },
+  { id: "TK-1039", client: "Restaurante Sabor & Cia", subject: "Instalação ponto extra", priority: "baixa" as const, status: "resolvido" as const, assignee: "André Técnico", date: "19/03/2026", timeAgo: "há 2 dias" },
+  { id: "TK-1038", client: "Roberto Almeida", subject: "Sem conexão", priority: "alta" as const, status: "em andamento" as const, assignee: "Rafael Técnico", date: "19/03/2026", timeAgo: "há 2 dias" },
+  { id: "TK-1037", client: "Clínica Bem Estar", subject: "Upgrade de plano", priority: "baixa" as const, status: "resolvido" as const, assignee: "Lucas Técnico", date: "18/03/2026", timeAgo: "há 3 dias" },
+  { id: "TK-1036", client: "João Pedro Costa", subject: "Configuração Wi-Fi", priority: "média" as const, status: "aguardando cliente" as const, assignee: "André Técnico", date: "18/03/2026", timeAgo: "há 3 dias" },
+  { id: "TK-1035", client: "Luciana Martins", subject: "Reativação de serviço", priority: "média" as const, status: "aberto" as const, assignee: "Lucas Técnico", date: "17/03/2026", timeAgo: "há 4 dias" },
+  { id: "TK-1034", client: "Ana Paula Santos", subject: "Segunda via de boleto", priority: "baixa" as const, status: "resolvido" as const, assignee: "André Técnico", date: "17/03/2026", timeAgo: "há 4 dias" },
+  { id: "TK-1033", client: "Fernanda Lima", subject: "Cancelamento", priority: "média" as const, status: "resolvido" as const, assignee: "Rafael Técnico", date: "16/03/2026", timeAgo: "há 5 dias" },
 ];
 
 export const mockPlans = [
@@ -90,10 +90,12 @@ export const mockConnectionIssues = [
 ];
 
 export const mockChartClients = [
-  { month: "Abr", clients: 4120 }, { month: "Mai", clients: 4210 }, { month: "Jun", clients: 4350 },
-  { month: "Jul", clients: 4420 }, { month: "Ago", clients: 4510 }, { month: "Set", clients: 4580 },
-  { month: "Out", clients: 4650 }, { month: "Nov", clients: 4700 }, { month: "Dez", clients: 4750 },
-  { month: "Jan", clients: 4790 }, { month: "Fev", clients: 4830 }, { month: "Mar", clients: 4872 },
+  { month: "Abr", clients: 4120, meta: 4200 }, { month: "Mai", clients: 4210, meta: 4300 },
+  { month: "Jun", clients: 4350, meta: 4400 }, { month: "Jul", clients: 4420, meta: 4500 },
+  { month: "Ago", clients: 4510, meta: 4600 }, { month: "Set", clients: 4580, meta: 4700 },
+  { month: "Out", clients: 4650, meta: 4800 }, { month: "Nov", clients: 4700, meta: 4850 },
+  { month: "Dez", clients: 4750, meta: 4900 }, { month: "Jan", clients: 4790, meta: 4950 },
+  { month: "Fev", clients: 4830, meta: 5000 }, { month: "Mar", clients: 4872, meta: 5050 },
 ];
 
 export const mockChartRevenue = [
@@ -113,6 +115,39 @@ export const mockCashflow = [
   { month: "Fev", inflow: 238000, outflow: 149000 },
   { month: "Mar", inflow: 243600, outflow: 158000 },
 ];
+
+export const mockPlanDistribution = [
+  { name: "Básico 50", value: 842, color: "#60A5FA" },
+  { name: "Padrão 100", value: 1856, color: "#2563EB" },
+  { name: "Turbo 200", value: 1245, color: "#8B5CF6" },
+  { name: "Ultra 300", value: 623, color: "#10B981" },
+  { name: "Empresarial 500", value: 306, color: "#F59E0B" },
+];
+
+export const mockChurnActivations = [
+  { month: "Out", activations: 180, cancellations: 92, netGrowth: 88 },
+  { month: "Nov", activations: 210, cancellations: 78, netGrowth: 132 },
+  { month: "Dez", activations: 165, cancellations: 105, netGrowth: 60 },
+  { month: "Jan", activations: 195, cancellations: 85, netGrowth: 110 },
+  { month: "Fev", activations: 220, cancellations: 72, netGrowth: 148 },
+  { month: "Mar", activations: 240, cancellations: 68, netGrowth: 172 },
+];
+
+// Weekly heatmap data (7 days x 24 hours)
+const days = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+export const mockHeatmapData: { day: string; hour: number; value: number }[] = [];
+days.forEach((day) => {
+  for (let h = 0; h < 24; h++) {
+    let base = 2;
+    if (h >= 8 && h <= 18) base = 8;
+    if (h >= 10 && h <= 14) base = 15;
+    if (h >= 19 && h <= 22) base = 12;
+    if (day === "Seg") base = Math.round(base * 1.3);
+    if (day === "Sáb" || day === "Dom") base = Math.round(base * 0.5);
+    const value = Math.max(0, Math.round(base + (Math.random() - 0.5) * base * 0.6));
+    mockHeatmapData.push({ day, hour: h, value });
+  }
+});
 
 export const mockAutomations = [
   {
@@ -140,4 +175,16 @@ export const mockAutomations = [
     description: "Envio periódico de pesquisa pós-atendimento para medir satisfação.",
     active: false, metric: "NPS atual: 72", highlight: "Identifica problemas cedo",
   },
+  {
+    id: "6", name: "Monitoramento de Velocidade", icon: "Gauge",
+    description: "Testa velocidade dos clientes e alerta quando está muito abaixo do contratado.",
+    active: true, metric: "47 alertas este mês", highlight: "Identifica problemas antes do cliente reclamar",
+  },
+];
+
+export const mockUptimeData = [
+  { hour: "00h", uptime: 99.8 }, { hour: "02h", uptime: 99.9 }, { hour: "04h", uptime: 100 },
+  { hour: "06h", uptime: 99.7 }, { hour: "08h", uptime: 99.5 }, { hour: "10h", uptime: 98.2 },
+  { hour: "12h", uptime: 99.1 }, { hour: "14h", uptime: 99.8 }, { hour: "16h", uptime: 99.9 },
+  { hour: "18h", uptime: 99.6 }, { hour: "20h", uptime: 99.4 }, { hour: "22h", uptime: 99.8 },
 ];
