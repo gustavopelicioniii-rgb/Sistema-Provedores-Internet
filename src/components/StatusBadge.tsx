@@ -1,35 +1,46 @@
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
-type StatusType = "ativo" | "suspenso" | "cancelado" | "inativo" | "pago" | "pendente" | "atrasado" | "aberto" | "em andamento" | "resolvido" | "emitida" | "cancelada" | "online" | "offline" | "warning" | "baixa" | "média" | "alta" | "crítica";
+type StatusType = "ativo" | "suspenso" | "cancelado" | "inativo" | "pago" | "pendente" | "atrasado" | "aberto" | "em andamento" | "aguardando cliente" | "resolvido" | "emitida" | "cancelada" | "online" | "offline" | "warning" | "baixa" | "média" | "alta" | "crítica";
 
-const statusConfig: Record<StatusType, { label: string; className: string }> = {
-  ativo: { label: "Ativo", className: "bg-success/10 text-success border-success/20" },
-  suspenso: { label: "Suspenso", className: "bg-warning/10 text-warning border-warning/20" },
-  cancelado: { label: "Cancelado", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  inativo: { label: "Inativo", className: "bg-muted text-muted-foreground" },
-  pago: { label: "Pago", className: "bg-success/10 text-success border-success/20" },
-  pendente: { label: "Pendente", className: "bg-warning/10 text-warning border-warning/20" },
-  atrasado: { label: "Atrasado", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  aberto: { label: "Aberto", className: "bg-primary/10 text-primary border-primary/20" },
-  "em andamento": { label: "Em andamento", className: "bg-warning/10 text-warning border-warning/20" },
-  resolvido: { label: "Resolvido", className: "bg-success/10 text-success border-success/20" },
-  emitida: { label: "Emitida", className: "bg-success/10 text-success border-success/20" },
-  cancelada: { label: "Cancelada", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  online: { label: "Online", className: "bg-success/10 text-success border-success/20" },
-  offline: { label: "Offline", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  warning: { label: "Alerta", className: "bg-warning/10 text-warning border-warning/20" },
-  baixa: { label: "Baixa", className: "bg-muted text-muted-foreground" },
-  média: { label: "Média", className: "bg-warning/10 text-warning border-warning/20" },
-  alta: { label: "Alta", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  crítica: { label: "Crítica", className: "bg-destructive text-destructive-foreground" },
+const statusConfig: Record<string, { label: string; bg: string; text: string; bold?: boolean }> = {
+  ativo:     { label: "Ativo",     bg: "#ECFDF5", text: "#059669" },
+  pago:      { label: "Pago",      bg: "#ECFDF5", text: "#059669" },
+  online:    { label: "Online",    bg: "#ECFDF5", text: "#059669" },
+  emitida:   { label: "Emitida",   bg: "#ECFDF5", text: "#059669" },
+  resolvido: { label: "Resolvido", bg: "#ECFDF5", text: "#059669" },
+
+  pendente:        { label: "Pendente",        bg: "#FEF3C7", text: "#D97706" },
+  "em andamento":  { label: "Em andamento",    bg: "#FEF3C7", text: "#D97706" },
+  "aguardando cliente": { label: "Aguardando", bg: "#FEF3C7", text: "#D97706" },
+  warning:         { label: "Alerta",          bg: "#FEF3C7", text: "#D97706" },
+  suspenso:        { label: "Suspenso",        bg: "#FEE2E2", text: "#DC2626" },
+  média:           { label: "Média",           bg: "#FEF3C7", text: "#D97706" },
+
+  atrasado:  { label: "Atrasado", bg: "#FEE2E2", text: "#DC2626" },
+  offline:   { label: "Offline",  bg: "#FEE2E2", text: "#DC2626" },
+  alta:      { label: "Alta",     bg: "#FEE2E2", text: "#DC2626" },
+  aberto:    { label: "Aberto",   bg: "#DBEAFE", text: "#2563EB" },
+
+  cancelado: { label: "Cancelado", bg: "#F1F5F9", text: "#64748B" },
+  cancelada: { label: "Cancelada", bg: "#F1F5F9", text: "#64748B" },
+  inativo:   { label: "Inativo",   bg: "#F1F5F9", text: "#64748B" },
+  baixa:     { label: "Baixa",     bg: "#F1F5F9", text: "#64748B" },
+
+  crítica:   { label: "Crítica", bg: "#DC2626", text: "#FFFFFF", bold: true },
 };
 
-export function StatusBadge({ status }: { status: StatusType }) {
-  const config = statusConfig[status] || { label: status, className: "" };
+export function StatusBadge({ status }: { status: string }) {
+  const config = statusConfig[status] || { label: status, bg: "#F1F5F9", text: "#64748B" };
   return (
-    <Badge variant="outline" className={cn("font-medium text-xs", config.className)}>
+    <span
+      className={cn("inline-flex items-center px-2.5 py-0.5 text-xs font-medium", config.bold && "font-bold")}
+      style={{
+        background: config.bg,
+        color: config.text,
+        borderRadius: 9999,
+      }}
+    >
       {config.label}
-    </Badge>
+    </span>
   );
 }
