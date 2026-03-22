@@ -17,6 +17,7 @@ import Tickets from "@/pages/Tickets";
 import Plans from "@/pages/Plans";
 import Reports from "@/pages/Reports";
 import SettingsPage from "@/pages/Settings";
+import AIAttendance from "@/pages/AIAttendance";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
