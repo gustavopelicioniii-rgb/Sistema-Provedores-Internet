@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, DollarSign, Network, Zap, Headphones,
-  FileText, BarChart3, Settings, Wifi, ChevronLeft
+  FileText, BarChart3, Settings, Wifi, ChevronLeft, Sparkles
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu,
@@ -30,6 +30,7 @@ const navGroups = [
       { title: "Rede", url: "/network", icon: Network },
       { title: "Automações", url: "/automations", icon: Zap },
       { title: "Tickets", url: "/tickets", icon: Headphones },
+      { title: "IA & Atendimento", url: "/ai-attendance", icon: Sparkles },
     ],
   },
   {
