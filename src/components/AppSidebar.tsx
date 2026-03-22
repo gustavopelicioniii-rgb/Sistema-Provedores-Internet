@@ -30,6 +30,7 @@ const navGroups = [
       { title: "Rede", url: "/network", icon: Network },
       { title: "Automações", url: "/automations", icon: Zap },
       { title: "Tickets", url: "/tickets", icon: Headphones },
+      { title: "IA & Atendimento", url: "/ai-attendance", icon: Sparkles },
     ],
   },
   {
