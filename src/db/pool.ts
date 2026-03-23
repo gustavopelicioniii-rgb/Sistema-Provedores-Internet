@@ -16,18 +16,14 @@ pool.on('error', (err) => {
   console.error(`[${new Date().toISOString()}] Unexpected pool error:`, err);
 });
 
-pool.on('connect', () => {
-  console.log(`[${new Date().toISOString()}] New client connected to pool`);
-});
+// pool.on('connect', () => {
+//   // Client connected to pool
+// });
 
 export async function query(text: string, params?: any[]) {
   const start = Date.now();
   try {
     const result = await pool.query(text, params);
-    const duration = Date.now() - start;
-    if (duration > 1000) {
-      console.warn(`[${new Date().toISOString()}] Slow query (${duration}ms): ${text.substring(0, 100)}`);
-    }
     return result;
   } catch (error: any) {
     console.error(`[${new Date().toISOString()}] Query error:`, error.message);

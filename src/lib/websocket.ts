@@ -16,7 +16,6 @@ function connect() {
     ws = new WebSocket(WS_URL);
 
     ws.onopen = () => {
-      console.log('[WS] Connected');
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
         reconnectTimeout = null;
@@ -36,7 +35,6 @@ function connect() {
     };
 
     ws.onclose = () => {
-      console.log('[WS] Disconnected, reconnecting in 5s...');
       ws = null;
       reconnectTimeout = setTimeout(connect, 5000);
     };

@@ -14,8 +14,6 @@ export function setupWebSocket(server: Server) {
   wss = new WebSocketServer({ server, path: '/ws' });
 
   wss.on('connection', (ws: WebSocket) => {
-    console.log(`[${new Date().toISOString()}] WebSocket client connected. Total: ${wss.clients.size}`);
-
     ws.send(JSON.stringify({
       type: 'CONNECTED',
       data: { message: 'Connected to NetAdmin WebSocket' },
@@ -23,7 +21,7 @@ export function setupWebSocket(server: Server) {
     }));
 
     ws.on('close', () => {
-      console.log(`[${new Date().toISOString()}] WebSocket client disconnected. Total: ${wss.clients.size}`);
+      // Client disconnected
     });
 
     ws.on('error', (err) => {
@@ -34,8 +32,6 @@ export function setupWebSocket(server: Server) {
   // Start periodic broadcasts
   startOLTStatusBroadcast();
   startSignalQualityBroadcast();
-
-  console.log(`[${new Date().toISOString()}] WebSocket server running on /ws`);
 }
 
 function broadcast(message: WSMessage) {
