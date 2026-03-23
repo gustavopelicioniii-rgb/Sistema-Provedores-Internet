@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,7 +7,7 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -17,7 +17,7 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   onConfirm: () => void | Promise<void>;
-  variant?: "danger" | "default";
+  variant?: 'danger' | 'default';
   isLoading?: boolean;
 }
 
@@ -26,10 +26,10 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = "Confirmar",
-  cancelLabel = "Cancelar",
+  confirmLabel = 'Confirmar',
+  cancelLabel = 'Cancelar',
   onConfirm,
-  variant = "default",
+  variant = 'default',
   isLoading = false,
 }: ConfirmDialogProps) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -49,24 +49,20 @@ export function ConfirmDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description && (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          )}
+          {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
         </AlertDialogHeader>
         <div className="flex gap-3 justify-end">
-          <AlertDialogCancel disabled={isProcessing || isLoading}>
-            {cancelLabel}
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={isProcessing || isLoading}>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isProcessing || isLoading}
             className={
-              variant === "danger"
-                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                : ""
+              variant === 'danger'
+                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                : ''
             }
           >
-            {isProcessing || isLoading ? "Processando..." : confirmLabel}
+            {isProcessing || isLoading ? 'Processando...' : confirmLabel}
           </AlertDialogAction>
         </div>
       </AlertDialogContent>

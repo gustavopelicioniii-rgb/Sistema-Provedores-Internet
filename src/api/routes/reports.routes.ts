@@ -8,15 +8,36 @@ const router = Router();
 router.get('/dashboard-kpis', async (req: Request, res: Response) => {
   const companyId = getCompanyId(req);
 
-  const [clientsRes, mrrRes, ticketsRes, churnRes, automationsRes, overdueRes, uptimeRes] = await Promise.all([
-    query(`SELECT COUNT(*) as total FROM clients WHERE company_id = $1 AND status = 'ativo'`, [companyId]),
-    query(`SELECT COALESCE(SUM(i.amount), 0) as mrr FROM invoices i WHERE i.company_id = $1 AND i.status = 'pago' AND i.paid_date >= NOW() - INTERVAL '30 days'`, [companyId]),
-    query(`SELECT COUNT(*) as total FROM tickets WHERE company_id = $1 AND status IN ('aberto', 'em_andamento')`, [companyId]),
-    query(`SELECT COALESCE(AVG(churn_score), 0) as avg_churn FROM clients WHERE company_id = $1 AND status = 'ativo'`, [companyId]),
-    query(`SELECT COALESCE(SUM(executions_count), 0) as total FROM automations WHERE company_id = $1 AND is_active = true`, [companyId]),
-    query(`SELECT COUNT(*) as total FROM invoices WHERE company_id = $1 AND status = 'atrasado'`, [companyId]),
-    query(`SELECT COUNT(*) as online, (SELECT COUNT(*) FROM olts WHERE company_id = $1) as total FROM olts WHERE company_id = $1 AND status = 'online'`, [companyId]),
-  ]);
+  const [clientsRes, mrrRes, ticketsRes, churnRes, automationsRes, overdueRes, uptimeRes] =
+    await Promise.all([
+      query(`SELECT COUNT(*) as total FROM clients WHERE company_id = $1 AND status = 'ativo'`, [
+        companyId,
+      ]),
+      query(
+        `SELECT COALESCE(SUM(i.amount), 0) as mrr FROM invoices i WHERE i.company_id = $1 AND i.status = 'pago' AND i.paid_date >= NOW() - INTERVAL '30 days'`,
+        [companyId]
+      ),
+      query(
+        `SELECT COUNT(*) as total FROM tickets WHERE company_id = $1 AND status IN ('aberto', 'em_andamento')`,
+        [companyId]
+      ),
+      query(
+        `SELECT COALESCE(AVG(churn_score), 0) as avg_churn FROM clients WHERE company_id = $1 AND status = 'ativo'`,
+        [companyId]
+      ),
+      query(
+        `SELECT COALESCE(SUM(executions_count), 0) as total FROM automations WHERE company_id = $1 AND is_active = true`,
+        [companyId]
+      ),
+      query(
+        `SELECT COUNT(*) as total FROM invoices WHERE company_id = $1 AND status = 'atrasado'`,
+        [companyId]
+      ),
+      query(
+        `SELECT COUNT(*) as online, (SELECT COUNT(*) FROM olts WHERE company_id = $1) as total FROM olts WHERE company_id = $1 AND status = 'online'`,
+        [companyId]
+      ),
+    ]);
 
   const totalOLTs = parseInt(uptimeRes.rows[0].total) || 1;
   const onlineOLTs = parseInt(uptimeRes.rows[0].online) || 0;

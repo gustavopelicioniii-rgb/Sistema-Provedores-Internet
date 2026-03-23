@@ -1,6 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../../db/pool.js';
-import { createTicketSchema, updateTicketSchema, createTicketCommentSchema, paginationSchema } from '../validators/schemas.js';
+import {
+  createTicketSchema,
+  updateTicketSchema,
+  createTicketCommentSchema,
+  paginationSchema,
+} from '../validators/schemas.js';
 import { getCompanyId } from '../middleware/rls.middleware.js';
 import { AppError } from '../middleware/error.middleware.js';
 
@@ -15,8 +20,16 @@ router.get('/', async (req: Request, res: Response) => {
   const values: any[] = [companyId];
   let idx = 2;
 
-  if (req.query.status) { conditions.push(`t.status = $${idx}`); values.push(req.query.status); idx++; }
-  if (req.query.priority) { conditions.push(`t.priority = $${idx}`); values.push(req.query.priority); idx++; }
+  if (req.query.status) {
+    conditions.push(`t.status = $${idx}`);
+    values.push(req.query.status);
+    idx++;
+  }
+  if (req.query.priority) {
+    conditions.push(`t.priority = $${idx}`);
+    values.push(req.query.priority);
+    idx++;
+  }
 
   const where = conditions.join(' AND ');
   const countResult = await query(`SELECT COUNT(*) FROM tickets t WHERE ${where}`, values);
@@ -31,7 +44,13 @@ router.get('/', async (req: Request, res: Response) => {
     [...values, limit, offset]
   );
 
-  res.json({ success: true, data: dataResult.rows, total: parseInt(countResult.rows[0].count), page, limit });
+  res.json({
+    success: true,
+    data: dataResult.rows,
+    total: parseInt(countResult.rows[0].count),
+    page,
+    limit,
+  });
 });
 
 // GET /api/tickets/:id
@@ -57,8 +76,16 @@ router.post('/', async (req: Request, res: Response) => {
   const result = await query(
     `INSERT INTO tickets (company_id, client_id, ticket_number, subject, description, priority, category, assignee_id)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-    [companyId, data.client_id || null, ticketNum, data.subject, data.description || null,
-     data.priority || 'media', data.category || null, data.assignee_id || null]
+    [
+      companyId,
+      data.client_id || null,
+      ticketNum,
+      data.subject,
+      data.description || null,
+      data.priority || 'media',
+      data.category || null,
+      data.assignee_id || null,
+    ]
   );
   res.status(201).json({ success: true, data: result.rows[0] });
 });
@@ -72,7 +99,11 @@ router.patch('/:id', async (req: Request, res: Response) => {
   let idx = 1;
 
   for (const [key, value] of Object.entries(data)) {
-    if (value !== undefined) { fields.push(`${key} = $${idx}`); values.push(value); idx++; }
+    if (value !== undefined) {
+      fields.push(`${key} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
   }
 
   if (data.status === 'resolvido' || data.status === 'fechado') {

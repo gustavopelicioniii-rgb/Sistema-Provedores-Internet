@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import { Maximize2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ReactNode } from 'react';
+import { Maximize2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ChartCardProps {
   title: string;
@@ -16,8 +16,8 @@ export function ChartCard({
   subtitle,
   children,
   onExpand,
-  minHeight = "min-h-80",
-  className = "",
+  minHeight = 'min-h-80',
+  className = '',
 }: ChartCardProps) {
   return (
     <div
@@ -27,9 +27,7 @@ export function ChartCard({
       <div className="flex items-start justify-between border-b border-border/50 p-6">
         <div className="space-y-1">
           <h3 className="font-semibold text-foreground">{title}</h3>
-          {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
-          )}
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         </div>
         {onExpand && (
           <Button

@@ -1,7 +1,14 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { usePlansComparison } from "@/hooks/usePlans";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { usePlansComparison } from '@/hooks/usePlans';
 
 interface PlansComparisonProps {
   open: boolean;
@@ -37,13 +44,17 @@ export function PlansComparison({ open, onOpenChange }: PlansComparisonProps) {
                 <TableRow className="glass-table-row border-none">
                   <TableCell className="font-medium text-sm">Download</TableCell>
                   {(plans || []).map((p: any) => (
-                    <TableCell key={p.id} className="text-center text-sm">{p.download_speed} Mbps</TableCell>
+                    <TableCell key={p.id} className="text-center text-sm">
+                      {p.download_speed} Mbps
+                    </TableCell>
                   ))}
                 </TableRow>
                 <TableRow className="glass-table-row border-none">
                   <TableCell className="font-medium text-sm">Upload</TableCell>
                   {(plans || []).map((p: any) => (
-                    <TableCell key={p.id} className="text-center text-sm">{p.upload_speed} Mbps</TableCell>
+                    <TableCell key={p.id} className="text-center text-sm">
+                      {p.upload_speed} Mbps
+                    </TableCell>
                   ))}
                 </TableRow>
                 <TableRow className="glass-table-row border-none">
@@ -57,14 +68,16 @@ export function PlansComparison({ open, onOpenChange }: PlansComparisonProps) {
                 <TableRow className="glass-table-row border-none">
                   <TableCell className="font-medium text-sm">SLA Uptime</TableCell>
                   {(plans || []).map((p: any) => (
-                    <TableCell key={p.id} className="text-center text-sm">{p.sla_uptime || 99.5}%</TableCell>
+                    <TableCell key={p.id} className="text-center text-sm">
+                      {p.sla_uptime || 99.5}%
+                    </TableCell>
                   ))}
                 </TableRow>
                 <TableRow className="glass-table-row border-none">
                   <TableCell className="font-medium text-sm">Clientes Ativos</TableCell>
                   {(plans || []).map((p: any) => (
                     <TableCell key={p.id} className="text-center text-sm font-medium">
-                      {Number(p.clients_count).toLocaleString("pt-BR")}
+                      {Number(p.clients_count).toLocaleString('pt-BR')}
                     </TableCell>
                   ))}
                 </TableRow>

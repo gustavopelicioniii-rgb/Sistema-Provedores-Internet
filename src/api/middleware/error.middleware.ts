@@ -17,7 +17,7 @@ export function errorMiddleware(err: Error, req: Request, res: Response, _next: 
   const timestamp = new Date().toISOString();
 
   if (err instanceof ZodError) {
-    const errors = err.errors.map(e => ({
+    const errors = err.errors.map((e) => ({
       field: e.path.join('.'),
       message: e.message,
     }));

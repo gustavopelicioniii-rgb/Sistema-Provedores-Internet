@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/shared/GlassCard";
+import { GlassCard } from '@/components/shared/GlassCard';
 
 interface RegionData {
   region: string;
@@ -15,19 +15,19 @@ interface RegionHeatmapProps {
 }
 
 function getQualityColor(quality: number): string {
-  if (quality >= 90) return "#10B981";
-  if (quality >= 75) return "#84CC16";
-  if (quality >= 60) return "#F59E0B";
-  if (quality >= 40) return "#F97316";
-  return "#EF4444";
+  if (quality >= 90) return '#10B981';
+  if (quality >= 75) return '#84CC16';
+  if (quality >= 60) return '#F59E0B';
+  if (quality >= 40) return '#F97316';
+  return '#EF4444';
 }
 
 function getQualityBg(quality: number): string {
-  if (quality >= 90) return "rgba(16,185,129,0.1)";
-  if (quality >= 75) return "rgba(132,204,22,0.1)";
-  if (quality >= 60) return "rgba(245,158,11,0.1)";
-  if (quality >= 40) return "rgba(249,115,22,0.1)";
-  return "rgba(239,68,68,0.1)";
+  if (quality >= 90) return 'rgba(16,185,129,0.1)';
+  if (quality >= 75) return 'rgba(132,204,22,0.1)';
+  if (quality >= 60) return 'rgba(245,158,11,0.1)';
+  if (quality >= 40) return 'rgba(249,115,22,0.1)';
+  return 'rgba(239,68,68,0.1)';
 }
 
 export function RegionHeatmap({ data, isLoading, onRegionClick }: RegionHeatmapProps) {
@@ -47,9 +47,18 @@ export function RegionHeatmap({ data, isLoading, onRegionClick }: RegionHeatmapP
   }
 
   // Aggregate by region
-  const regions = new Map<string, { olts: number; clients: number; qualitySum: number; count: number; statuses: string[] }>();
+  const regions = new Map<
+    string,
+    { olts: number; clients: number; qualitySum: number; count: number; statuses: string[] }
+  >();
   data.forEach((d) => {
-    const existing = regions.get(d.region) || { olts: 0, clients: 0, qualitySum: 0, count: 0, statuses: [] };
+    const existing = regions.get(d.region) || {
+      olts: 0,
+      clients: 0,
+      qualitySum: 0,
+      count: 0,
+      statuses: [],
+    };
     existing.olts += d.olt_count;
     existing.clients += d.client_count;
     existing.qualitySum += parseFloat(d.quality);
@@ -93,9 +102,12 @@ export function RegionHeatmap({ data, isLoading, onRegionClick }: RegionHeatmapP
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium truncate">{region.name}</span>
                     {(region.hasOffline || region.hasWarning) && (
-                      <span className="h-2 w-2 rounded-full" style={{
-                        background: region.hasOffline ? "#EF4444" : "#F59E0B"
-                      }} />
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          background: region.hasOffline ? '#EF4444' : '#F59E0B',
+                        }}
+                      />
                     )}
                   </div>
                   <div className="text-lg font-bold" style={{ color }}>
@@ -113,9 +125,18 @@ export function RegionHeatmap({ data, isLoading, onRegionClick }: RegionHeatmapP
 
         {/* Legend */}
         <div className="flex justify-center gap-4 mt-4 text-[10px] text-muted-foreground">
-          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm" style={{ background: "#10B981" }} />Otimo (90+)</span>
-          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm" style={{ background: "#F59E0B" }} />Regular (60-89)</span>
-          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm" style={{ background: "#EF4444" }} />Critico (&lt;60)</span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-sm" style={{ background: '#10B981' }} />
+            Otimo (90+)
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-sm" style={{ background: '#F59E0B' }} />
+            Regular (60-89)
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-sm" style={{ background: '#EF4444' }} />
+            Critico (&lt;60)
+          </span>
         </div>
       </div>
     </GlassCard>

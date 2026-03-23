@@ -1,39 +1,42 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Clock } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Clock } from 'lucide-react';
 
 const routeNames: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/clients": "Clientes",
-  "/finance": "Financeiro",
-  "/network": "Rede e Conexões",
-  "/automations": "Automações",
-  "/tickets": "Tickets",
-  "/ai-attendance": "IA & Atendimento",
-  "/plans": "Planos e Serviços",
-  "/reports": "Relatórios",
-  "/settings": "Configurações",
+  '/dashboard': 'Dashboard',
+  '/clients': 'Clientes',
+  '/finance': 'Financeiro',
+  '/network': 'Rede e Conexões',
+  '/automations': 'Automações',
+  '/tickets': 'Tickets',
+  '/ai-attendance': 'IA & Atendimento',
+  '/plans': 'Planos e Serviços',
+  '/reports': 'Relatórios',
+  '/settings': 'Configurações',
 };
 
 type RecentItem = { path: string; label: string; timestamp: number };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRecentNavigation() {
   const location = useLocation();
   const [recent, setRecent] = useState<RecentItem[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem("netadmin-recent-nav") || "[]");
-    } catch { return []; }
+      return JSON.parse(localStorage.getItem('netadmin-recent-nav') || '[]');
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
-    const basePath = "/" + location.pathname.split("/").filter(Boolean)[0];
+    const basePath = '/' + location.pathname.split('/').filter(Boolean)[0];
     const label = routeNames[basePath];
     if (!label) return;
 
     setRecent((prev) => {
       const filtered = prev.filter((r) => r.path !== basePath);
       const updated = [{ path: basePath, label, timestamp: Date.now() }, ...filtered].slice(0, 3);
-      localStorage.setItem("netadmin-recent-nav", JSON.stringify(updated));
+      localStorage.setItem('netadmin-recent-nav', JSON.stringify(updated));
       return updated;
     });
   }, [location.pathname]);

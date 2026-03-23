@@ -1,5 +1,5 @@
-import { LucideIcon } from "lucide-react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { LucideIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface KPICardProps {
   title: string;
@@ -7,7 +7,7 @@ interface KPICardProps {
   icon: LucideIcon;
   trend?: {
     value: number;
-    direction: "up" | "down";
+    direction: 'up' | 'down';
   };
   iconColor?: string;
   iconBg?: string;
@@ -19,9 +19,9 @@ export function KPICard({
   value,
   icon: Icon,
   trend,
-  iconColor = "text-blue-500",
-  iconBg = "bg-blue-500/10",
-  className = "",
+  iconColor = 'text-blue-500',
+  iconBg = 'bg-blue-500/10',
+  className = '',
 }: KPICardProps) {
   return (
     <div
@@ -46,12 +46,12 @@ export function KPICard({
             {trend && (
               <div
                 className={`flex items-center gap-1 text-xs font-semibold ${
-                  trend.direction === "up"
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
+                  trend.direction === 'up'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
                 }`}
               >
-                {trend.direction === "up" ? (
+                {trend.direction === 'up' ? (
                   <TrendingUp className="h-4 w-4" />
                 ) : (
                   <TrendingDown className="h-4 w-4" />

@@ -14,11 +14,13 @@ export function setupWebSocket(server: Server) {
   wss = new WebSocketServer({ server, path: '/ws' });
 
   wss.on('connection', (ws: WebSocket) => {
-    ws.send(JSON.stringify({
-      type: 'CONNECTED',
-      data: { message: 'Connected to NetAdmin WebSocket' },
-      timestamp: new Date().toISOString(),
-    }));
+    ws.send(
+      JSON.stringify({
+        type: 'CONNECTED',
+        data: { message: 'Connected to NetAdmin WebSocket' },
+        timestamp: new Date().toISOString(),
+      })
+    );
 
     ws.on('close', () => {
       // Client disconnected

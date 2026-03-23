@@ -1,44 +1,59 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, DollarSign, Network, Zap, Headphones,
-  FileText, BarChart3, Settings, Wifi, Sparkles
-} from "lucide-react";
+  LayoutDashboard,
+  Users,
+  DollarSign,
+  Network,
+  Zap,
+  Headphones,
+  FileText,
+  BarChart3,
+  Settings,
+  Wifi,
+  Sparkles,
+} from 'lucide-react';
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar
-} from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
-import { RecentNavigation } from "@/components/shared/RecentNavigation";
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
+import { RecentNavigation } from '@/components/shared/RecentNavigation';
 
 const navGroups = [
   {
-    label: "PRINCIPAL",
+    label: 'PRINCIPAL',
+    items: [{ title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard }],
+  },
+  {
+    label: 'GESTÃO',
     items: [
-      { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+      { title: 'Clientes', url: '/clients', icon: Users },
+      { title: 'Financeiro', url: '/finance', icon: DollarSign },
+      { title: 'Planos', url: '/plans', icon: FileText },
     ],
   },
   {
-    label: "GESTÃO",
+    label: 'OPERAÇÕES',
     items: [
-      { title: "Clientes", url: "/clients", icon: Users },
-      { title: "Financeiro", url: "/finance", icon: DollarSign },
-      { title: "Planos", url: "/plans", icon: FileText },
+      { title: 'Rede', url: '/network', icon: Network },
+      { title: 'Automações', url: '/automations', icon: Zap },
+      { title: 'Tickets', url: '/tickets', icon: Headphones },
+      { title: 'IA & Atendimento', url: '/ai-attendance', icon: Sparkles },
     ],
   },
   {
-    label: "OPERAÇÕES",
+    label: 'ANÁLISE',
     items: [
-      { title: "Rede", url: "/network", icon: Network },
-      { title: "Automações", url: "/automations", icon: Zap },
-      { title: "Tickets", url: "/tickets", icon: Headphones },
-      { title: "IA & Atendimento", url: "/ai-attendance", icon: Sparkles },
-    ],
-  },
-  {
-    label: "ANÁLISE",
-    items: [
-      { title: "Relatórios", url: "/reports", icon: BarChart3 },
-      { title: "Configurações", url: "/settings", icon: Settings },
+      { title: 'Relatórios', url: '/reports', icon: BarChart3 },
+      { title: 'Configurações', url: '/settings', icon: Settings },
     ],
   },
 ];
@@ -46,7 +61,7 @@ const navGroups = [
 export function Sidebar() {
   const location = useLocation();
   const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const collapsed = state === 'collapsed';
 
   return (
     <Sidebar collapsible="icon" className="glass-sidebar border-none">
@@ -69,10 +84,13 @@ export function Sidebar() {
                   const isActive = location.pathname.startsWith(item.url);
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild className={cn(
-                        "transition-all duration-200 rounded-lg my-0.5",
-                        isActive ? "sidebar-item-active" : "hover:bg-accent/60"
-                      )}>
+                      <SidebarMenuButton
+                        asChild
+                        className={cn(
+                          'transition-all duration-200 rounded-lg my-0.5',
+                          isActive ? 'sidebar-item-active' : 'hover:bg-accent/60'
+                        )}
+                      >
                         <Link to={item.url} className="flex items-center gap-3">
                           <item.icon
                             className="flex-shrink-0"

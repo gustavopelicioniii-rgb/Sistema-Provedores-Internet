@@ -1,6 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../../db/pool.js';
-import { createInvoiceSchema, updateInvoiceSchema, paginationSchema } from '../validators/schemas.js';
+import {
+  createInvoiceSchema,
+  updateInvoiceSchema,
+  paginationSchema,
+} from '../validators/schemas.js';
 import { getCompanyId } from '../middleware/rls.middleware.js';
 import { AppError } from '../middleware/error.middleware.js';
 
@@ -15,8 +19,16 @@ router.get('/', async (req: Request, res: Response) => {
   const values: any[] = [companyId];
   let idx = 2;
 
-  if (req.query.status) { conditions.push(`i.status = $${idx}`); values.push(req.query.status); idx++; }
-  if (req.query.client_id) { conditions.push(`i.client_id = $${idx}`); values.push(req.query.client_id); idx++; }
+  if (req.query.status) {
+    conditions.push(`i.status = $${idx}`);
+    values.push(req.query.status);
+    idx++;
+  }
+  if (req.query.client_id) {
+    conditions.push(`i.client_id = $${idx}`);
+    values.push(req.query.client_id);
+    idx++;
+  }
 
   const where = conditions.join(' AND ');
   const countResult = await query(`SELECT COUNT(*) FROM invoices i WHERE ${where}`, values);
@@ -30,7 +42,13 @@ router.get('/', async (req: Request, res: Response) => {
     [...values, limit, offset]
   );
 
-  res.json({ success: true, data: dataResult.rows, total: parseInt(countResult.rows[0].count), page, limit });
+  res.json({
+    success: true,
+    data: dataResult.rows,
+    total: parseInt(countResult.rows[0].count),
+    page,
+    limit,
+  });
 });
 
 // POST /api/invoices
@@ -41,8 +59,17 @@ router.post('/', async (req: Request, res: Response) => {
   const result = await query(
     `INSERT INTO invoices (company_id, client_id, subscription_id, invoice_number, amount, due_date, status, payment_method, notes)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-    [companyId, data.client_id, data.subscription_id || null, invoiceNum, data.amount,
-     data.due_date, data.status || 'pendente', data.payment_method || null, data.notes || null]
+    [
+      companyId,
+      data.client_id,
+      data.subscription_id || null,
+      invoiceNum,
+      data.amount,
+      data.due_date,
+      data.status || 'pendente',
+      data.payment_method || null,
+      data.notes || null,
+    ]
   );
   res.status(201).json({ success: true, data: result.rows[0] });
 });
@@ -56,7 +83,11 @@ router.patch('/:id', async (req: Request, res: Response) => {
   let idx = 1;
 
   for (const [key, value] of Object.entries(data)) {
-    if (value !== undefined) { fields.push(`${key} = $${idx}`); values.push(value); idx++; }
+    if (value !== undefined) {
+      fields.push(`${key} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
   }
 
   if (data.status === 'pago') {

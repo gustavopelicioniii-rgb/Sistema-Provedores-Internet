@@ -1,34 +1,34 @@
-import { Link, useLocation, useParams } from "react-router-dom";
-import { ChevronRight, Home } from "lucide-react";
-import { mockClients } from "@/data/mockData";
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { ChevronRight, Home } from 'lucide-react';
+import { mockClients } from '@/data/mockData';
 
 const routeNames: Record<string, string> = {
-  dashboard: "Dashboard",
-  clients: "Clientes",
-  finance: "Financeiro",
-  network: "Rede e Conexões",
-  automations: "Automações",
-  tickets: "Tickets",
-  "ai-attendance": "IA & Atendimento",
-  plans: "Planos e Serviços",
-  reports: "Relatórios",
-  settings: "Configurações",
+  dashboard: 'Dashboard',
+  clients: 'Clientes',
+  finance: 'Financeiro',
+  network: 'Rede e Conexões',
+  automations: 'Automações',
+  tickets: 'Tickets',
+  'ai-attendance': 'IA & Atendimento',
+  plans: 'Planos e Serviços',
+  reports: 'Relatórios',
+  settings: 'Configurações',
 };
 
 export function Breadcrumb() {
   const location = useLocation();
-  const segments = location.pathname.split("/").filter(Boolean);
+  const segments = location.pathname.split('/').filter(Boolean);
 
   if (segments.length <= 1) return null;
 
   const crumbs: { label: string; path: string }[] = [];
 
   segments.forEach((seg, i) => {
-    const path = "/" + segments.slice(0, i + 1).join("/");
+    const path = '/' + segments.slice(0, i + 1).join('/');
     let label = routeNames[seg] || seg;
 
     // Check if it's a client ID
-    if (segments[i - 1] === "clients" && !routeNames[seg]) {
+    if (segments[i - 1] === 'clients' && !routeNames[seg]) {
       const client = mockClients.find((c) => c.id === seg);
       label = client?.name || `Cliente #${seg}`;
     }

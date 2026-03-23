@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ReactNode } from 'react';
+import { LucideIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -18,7 +18,7 @@ export function EmptyState({
   title,
   description,
   action,
-  className = "",
+  className = '',
 }: EmptyStateProps) {
   return (
     <div
@@ -32,11 +32,7 @@ export function EmptyState({
 
       <div className="space-y-2 text-center">
         <h3 className="font-semibold text-foreground">{title}</h3>
-        {description && (
-          <p className="text-sm text-muted-foreground max-w-xs">
-            {description}
-          </p>
-        )}
+        {description && <p className="text-sm text-muted-foreground max-w-xs">{description}</p>}
       </div>
 
       {action && (

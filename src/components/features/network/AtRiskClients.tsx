@@ -1,8 +1,15 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { AlertTriangle, Ticket, Bell } from "lucide-react";
+import { GlassCard } from '@/components/shared/GlassCard';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { AlertTriangle, Ticket, Bell } from 'lucide-react';
 
 interface AtRiskClient {
   id: string;
@@ -24,7 +31,12 @@ interface AtRiskClientsProps {
   onNotifyClient?: (clientId: string) => void;
 }
 
-export function AtRiskClients({ clients, isLoading, onCreateTicket, onNotifyClient }: AtRiskClientsProps) {
+export function AtRiskClients({
+  clients,
+  isLoading,
+  onCreateTicket,
+  onNotifyClient,
+}: AtRiskClientsProps) {
   if (isLoading) {
     return (
       <GlassCard>
@@ -76,34 +88,54 @@ export function AtRiskClients({ clients, isLoading, onCreateTicket, onNotifyClie
               {clients.map((client) => (
                 <TableRow key={client.id} className="glass-table-row border-none">
                   <TableCell className="text-sm font-medium">{client.name}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground">{client.olt_name || "-"}</TableCell>
-                  <TableCell className="text-xs">{client.plan_name || "-"}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {client.olt_name || '-'}
+                  </TableCell>
+                  <TableCell className="text-xs">{client.plan_name || '-'}</TableCell>
                   <TableCell>
-                    <span className={`text-sm font-medium ${
-                      client.signal_rx < -27 ? "text-destructive" : "text-amber-500"
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        client.signal_rx < -27 ? 'text-destructive' : 'text-amber-500'
+                      }`}
+                    >
                       {Number(client.signal_rx).toFixed(1)}
                     </span>
                   </TableCell>
-                  <TableCell><StatusBadge status={client.status} /></TableCell>
                   <TableCell>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                      client.churn_score >= 75 ? "bg-destructive/10 text-destructive" :
-                      client.churn_score >= 50 ? "bg-amber-100 text-amber-700" :
-                      "bg-blue-100 text-blue-700"
-                    }`}>
+                    <StatusBadge status={client.status} />
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        client.churn_score >= 75
+                          ? 'bg-destructive/10 text-destructive'
+                          : client.churn_score >= 50
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-blue-100 text-blue-700'
+                      }`}
+                    >
                       {client.churn_score}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px]"
-                        onClick={() => onCreateTicket?.(client.id)}>
-                        <Ticket className="h-3 w-3 mr-1" />Ticket
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-[10px]"
+                        onClick={() => onCreateTicket?.(client.id)}
+                      >
+                        <Ticket className="h-3 w-3 mr-1" />
+                        Ticket
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px]"
-                        onClick={() => onNotifyClient?.(client.id)}>
-                        <Bell className="h-3 w-3 mr-1" />Notificar
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-[10px]"
+                        onClick={() => onNotifyClient?.(client.id)}
+                      >
+                        <Bell className="h-3 w-3 mr-1" />
+                        Notificar
                       </Button>
                     </div>
                   </TableCell>

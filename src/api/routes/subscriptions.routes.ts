@@ -12,7 +12,9 @@ router.get('/', async (req: Request, res: Response) => {
   const { page, limit } = paginationSchema.parse(req.query);
   const offset = (page - 1) * limit;
 
-  const countResult = await query(`SELECT COUNT(*) FROM subscriptions WHERE company_id = $1`, [companyId]);
+  const countResult = await query(`SELECT COUNT(*) FROM subscriptions WHERE company_id = $1`, [
+    companyId,
+  ]);
   const dataResult = await query(
     `SELECT s.*, c.name as client_name, p.name as plan_name
      FROM subscriptions s
@@ -23,7 +25,13 @@ router.get('/', async (req: Request, res: Response) => {
     [companyId, limit, offset]
   );
 
-  res.json({ success: true, data: dataResult.rows, total: parseInt(countResult.rows[0].count), page, limit });
+  res.json({
+    success: true,
+    data: dataResult.rows,
+    total: parseInt(countResult.rows[0].count),
+    page,
+    limit,
+  });
 });
 
 // POST /api/subscriptions
@@ -33,7 +41,14 @@ router.post('/', async (req: Request, res: Response) => {
   const result = await query(
     `INSERT INTO subscriptions (company_id, client_id, plan_id, monthly_price, discount, start_date)
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [companyId, data.client_id, data.plan_id, data.monthly_price, data.discount || 0, data.start_date || 'now()']
+    [
+      companyId,
+      data.client_id,
+      data.plan_id,
+      data.monthly_price,
+      data.discount || 0,
+      data.start_date || 'now()',
+    ]
   );
   res.status(201).json({ success: true, data: result.rows[0] });
 });

@@ -111,10 +111,7 @@ export class AuthService {
 
   static async refreshToken(payload: JWTPayload) {
     // Verify user still exists and is active
-    const result = await query(
-      'SELECT id, is_active FROM users WHERE id = $1',
-      [payload.userId]
-    );
+    const result = await query('SELECT id, is_active FROM users WHERE id = $1', [payload.userId]);
 
     if (result.rowCount === 0 || !result.rows[0].is_active) {
       throw new AppError('Sessão inválida', 401, 'INVALID_SESSION');

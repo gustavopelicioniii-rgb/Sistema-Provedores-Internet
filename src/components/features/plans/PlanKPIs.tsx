@@ -1,5 +1,14 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { TrendingUp, TrendingDown, Users, DollarSign, AlertTriangle, ArrowUpRight, ArrowDownRight, Percent } from "lucide-react";
+import { GlassCard } from '@/components/shared/GlassCard';
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  DollarSign,
+  AlertTriangle,
+  ArrowUpRight,
+  ArrowDownRight,
+  Percent,
+} from 'lucide-react';
 
 interface PlanKPIsProps {
   kpis: {
@@ -33,51 +42,51 @@ export function PlanKPIs({ kpis, isLoading }: PlanKPIsProps) {
 
   const cards = [
     {
-      label: "Adesao",
+      label: 'Adesao',
       value: `${kpis.adoption_rate}%`,
       icon: Users,
-      bg: "rgba(59,130,246,0.1)",
-      iconColor: "#2563EB",
+      bg: 'rgba(59,130,246,0.1)',
+      iconColor: '#2563EB',
       trend: kpis.adoption_rate > 30,
     },
     {
-      label: "Churn",
+      label: 'Churn',
       value: `${kpis.churn_rate}%`,
       icon: TrendingDown,
-      bg: "rgba(239,68,68,0.1)",
-      iconColor: "#EF4444",
+      bg: 'rgba(239,68,68,0.1)',
+      iconColor: '#EF4444',
       trend: kpis.churn_rate < 5,
     },
     {
-      label: "Inadimplencia",
+      label: 'Inadimplencia',
       value: `${kpis.default_rate}%`,
       icon: AlertTriangle,
-      bg: "rgba(245,158,11,0.1)",
-      iconColor: "#F59E0B",
+      bg: 'rgba(245,158,11,0.1)',
+      iconColor: '#F59E0B',
       trend: kpis.default_rate < 3,
     },
     {
-      label: "Margem",
+      label: 'Margem',
       value: `${kpis.estimated_margin}%`,
       icon: Percent,
-      bg: "rgba(16,185,129,0.1)",
-      iconColor: "#10B981",
+      bg: 'rgba(16,185,129,0.1)',
+      iconColor: '#10B981',
       trend: kpis.estimated_margin > 50,
     },
     {
-      label: "Receita",
-      value: `R$ ${kpis.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}`,
+      label: 'Receita',
+      value: `R$ ${kpis.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`,
       icon: DollarSign,
-      bg: "rgba(16,185,129,0.1)",
-      iconColor: "#10B981",
+      bg: 'rgba(16,185,129,0.1)',
+      iconColor: '#10B981',
       trend: true,
     },
     {
-      label: "Upgrades / Downgrades",
+      label: 'Upgrades / Downgrades',
       value: `${kpis.upgrades} / ${kpis.downgrades}`,
       icon: TrendingUp,
-      bg: "rgba(139,92,246,0.1)",
-      iconColor: "#8B5CF6",
+      bg: 'rgba(139,92,246,0.1)',
+      iconColor: '#8B5CF6',
       trend: kpis.upgrades > kpis.downgrades,
     },
   ];
@@ -89,7 +98,10 @@ export function PlanKPIs({ kpis, isLoading }: PlanKPIsProps) {
           <div className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-medium text-muted-foreground">{card.label}</span>
-              <div className="h-7 w-7 rounded-lg flex items-center justify-center" style={{ background: card.bg }}>
+              <div
+                className="h-7 w-7 rounded-lg flex items-center justify-center"
+                style={{ background: card.bg }}
+              >
                 <card.icon style={{ width: 14, height: 14, color: card.iconColor }} />
               </div>
             </div>

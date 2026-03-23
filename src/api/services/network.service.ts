@@ -4,14 +4,21 @@ import type { CreateOLTInput, UpdateOLTInput } from '../validators/schemas.js';
 
 export class NetworkService {
   // ==================== OLTs ====================
-  static async listOLTs(companyId: string, params: { page: number; limit: number; status?: string }) {
+  static async listOLTs(
+    companyId: string,
+    params: { page: number; limit: number; status?: string }
+  ) {
     const { page, limit, status } = params;
     const offset = (page - 1) * limit;
     const conditions: string[] = ['o.company_id = $1'];
     const values: any[] = [companyId];
     let idx = 2;
 
-    if (status) { conditions.push(`o.status = $${idx}`); values.push(status); idx++; }
+    if (status) {
+      conditions.push(`o.status = $${idx}`);
+      values.push(status);
+      idx++;
+    }
 
     const where = conditions.join(' AND ');
     const countResult = await query(`SELECT COUNT(*) FROM olts o WHERE ${where}`, values);
@@ -30,7 +37,8 @@ export class NetworkService {
     return {
       data: dataResult.rows,
       total: parseInt(countResult.rows[0].count),
-      page, limit,
+      page,
+      limit,
       totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
     };
   }
@@ -55,9 +63,18 @@ export class NetworkService {
       `INSERT INTO olts (company_id, name, model, ip_address, port, location, latitude, longitude, max_clients, firmware_version)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
-      [companyId, data.name, data.model || null, data.ip_address, data.port || null,
-       data.location || null, data.latitude || null, data.longitude || null,
-       data.max_clients || 256, data.firmware_version || null]
+      [
+        companyId,
+        data.name,
+        data.model || null,
+        data.ip_address,
+        data.port || null,
+        data.location || null,
+        data.latitude || null,
+        data.longitude || null,
+        data.max_clients || 256,
+        data.firmware_version || null,
+      ]
     );
     return result.rows[0];
   }
@@ -67,8 +84,19 @@ export class NetworkService {
     const values: any[] = [];
     let idx = 1;
 
-    const allowedFields = ['name', 'model', 'ip_address', 'port', 'location', 'latitude', 'longitude',
-                           'status', 'max_clients', 'firmware_version', 'signal_quality'];
+    const allowedFields = [
+      'name',
+      'model',
+      'ip_address',
+      'port',
+      'location',
+      'latitude',
+      'longitude',
+      'status',
+      'max_clients',
+      'firmware_version',
+      'signal_quality',
+    ];
     for (const field of allowedFields) {
       if ((data as any)[field] !== undefined) {
         fields.push(`${field} = $${idx}`);
@@ -104,9 +132,10 @@ export class NetworkService {
       signal_quality: olt.signal_quality || 0,
       clients_connected: parseInt(olt.clients_connected) || 0,
       max_clients: olt.max_clients,
-      capacity_percent: olt.max_clients > 0
-        ? ((parseInt(olt.clients_connected) / olt.max_clients) * 100).toFixed(1)
-        : '0',
+      capacity_percent:
+        olt.max_clients > 0
+          ? ((parseInt(olt.clients_connected) / olt.max_clients) * 100).toFixed(1)
+          : '0',
     };
   }
 
@@ -136,18 +165,32 @@ export class NetworkService {
   }
 
   // ==================== Incidents ====================
-  static async listIncidents(companyId: string, params: { page: number; limit: number; dateFrom?: string; dateTo?: string }) {
+  static async listIncidents(
+    companyId: string,
+    params: { page: number; limit: number; dateFrom?: string; dateTo?: string }
+  ) {
     const { page, limit, dateFrom, dateTo } = params;
     const offset = (page - 1) * limit;
     const conditions: string[] = ['ni.company_id = $1'];
     const values: any[] = [companyId];
     let idx = 2;
 
-    if (dateFrom) { conditions.push(`ni.started_at >= $${idx}`); values.push(dateFrom); idx++; }
-    if (dateTo) { conditions.push(`ni.started_at <= $${idx}`); values.push(dateTo); idx++; }
+    if (dateFrom) {
+      conditions.push(`ni.started_at >= $${idx}`);
+      values.push(dateFrom);
+      idx++;
+    }
+    if (dateTo) {
+      conditions.push(`ni.started_at <= $${idx}`);
+      values.push(dateTo);
+      idx++;
+    }
 
     const where = conditions.join(' AND ');
-    const countResult = await query(`SELECT COUNT(*) FROM network_incidents ni WHERE ${where}`, values);
+    const countResult = await query(
+      `SELECT COUNT(*) FROM network_incidents ni WHERE ${where}`,
+      values
+    );
 
     const dataResult = await query(
       `SELECT ni.*, o.name as olt_name, o.ip_address as olt_ip
@@ -162,7 +205,8 @@ export class NetworkService {
     return {
       data: dataResult.rows,
       total: parseInt(countResult.rows[0].count),
-      page, limit,
+      page,
+      limit,
     };
   }
 
@@ -171,8 +215,14 @@ export class NetworkService {
       `INSERT INTO network_incidents (company_id, olt_id, type, description, clients_affected, severity)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [companyId, data.olt_id || null, data.type, data.description || null,
-       data.clients_affected || 0, data.severity || 'medium']
+      [
+        companyId,
+        data.olt_id || null,
+        data.type,
+        data.description || null,
+        data.clients_affected || 0,
+        data.severity || 'medium',
+      ]
     );
     return result.rows[0];
   }
@@ -225,7 +275,7 @@ export class NetworkService {
       [companyId]
     );
 
-    return result.rows.map(r => ({
+    return result.rows.map((r) => ({
       region: r.region || 'Sem localização',
       status: r.status,
       olt_count: parseInt(r.olt_count),

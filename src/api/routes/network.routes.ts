@@ -1,6 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { NetworkService } from '../services/network.service.js';
-import { createOLTSchema, updateOLTSchema, createIncidentSchema, paginationSchema } from '../validators/schemas.js';
+import {
+  createOLTSchema,
+  updateOLTSchema,
+  createIncidentSchema,
+  paginationSchema,
+} from '../validators/schemas.js';
 import { getCompanyId } from '../middleware/rls.middleware.js';
 
 const router = Router();

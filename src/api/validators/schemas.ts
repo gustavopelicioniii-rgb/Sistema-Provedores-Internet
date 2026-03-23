@@ -78,7 +78,9 @@ export const updateTicketSchema = z.object({
   subject: z.string().optional(),
   description: z.string().optional(),
   priority: z.enum(['baixa', 'media', 'alta', 'critica']).optional(),
-  status: z.enum(['aberto', 'em_andamento', 'aguardando_cliente', 'resolvido', 'fechado']).optional(),
+  status: z
+    .enum(['aberto', 'em_andamento', 'aguardando_cliente', 'resolvido', 'fechado'])
+    .optional(),
   category: z.string().optional(),
   assignee_id: z.string().uuid().optional(),
 });

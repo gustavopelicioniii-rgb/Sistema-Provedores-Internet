@@ -3,7 +3,10 @@ import { AppError } from '../middleware/error.middleware.js';
 import type { CreatePlanInput, UpdatePlanInput } from '../validators/schemas.js';
 
 export class PlanService {
-  static async list(companyId: string, params: { page: number; limit: number; status?: string; search?: string }) {
+  static async list(
+    companyId: string,
+    params: { page: number; limit: number; status?: string; search?: string }
+  ) {
     const { page, limit, status, search } = params;
     const offset = (page - 1) * limit;
     const conditions: string[] = ['p.company_id = $1'];
@@ -24,10 +27,7 @@ export class PlanService {
 
     const where = conditions.join(' AND ');
 
-    const countResult = await query(
-      `SELECT COUNT(*) FROM plans p WHERE ${where}`,
-      values
-    );
+    const countResult = await query(`SELECT COUNT(*) FROM plans p WHERE ${where}`, values);
 
     const dataResult = await query(
       `SELECT p.*,
@@ -93,11 +93,22 @@ export class PlanService {
     const values: any[] = [];
     let idx = 1;
 
-    const allowedFields = ['name', 'download_speed', 'upload_speed', 'monthly_price', 'description', 'sla_uptime', 'data_cap', 'status'];
+    const allowedFields = [
+      'name',
+      'download_speed',
+      'upload_speed',
+      'monthly_price',
+      'description',
+      'sla_uptime',
+      'data_cap',
+      'status',
+    ];
     for (const field of allowedFields) {
       if ((data as any)[field] !== undefined) {
         fields.push(`${field} = $${idx}`);
-        values.push(field === 'features' ? JSON.stringify((data as any)[field]) : (data as any)[field]);
+        values.push(
+          field === 'features' ? JSON.stringify((data as any)[field]) : (data as any)[field]
+        );
         idx++;
       }
     }
@@ -134,13 +145,17 @@ export class PlanService {
     );
 
     if (parseInt(clients.rows[0].count) > 0) {
-      throw new AppError('Não é possível excluir plano com clientes ativos', 400, 'HAS_ACTIVE_CLIENTS');
+      throw new AppError(
+        'Não é possível excluir plano com clientes ativos',
+        400,
+        'HAS_ACTIVE_CLIENTS'
+      );
     }
 
-    const result = await query(
-      'DELETE FROM plans WHERE id = $1 AND company_id = $2 RETURNING id',
-      [planId, companyId]
-    );
+    const result = await query('DELETE FROM plans WHERE id = $1 AND company_id = $2 RETURNING id', [
+      planId,
+      companyId,
+    ]);
 
     if (result.rowCount === 0) {
       throw new AppError('Plano não encontrado', 404, 'NOT_FOUND');
@@ -152,10 +167,9 @@ export class PlanService {
   static async getKPIs(companyId: string, planId: string) {
     const plan = await PlanService.getById(companyId, planId);
 
-    const totalClients = await query(
-      `SELECT COUNT(*) FROM clients WHERE company_id = $1`,
-      [companyId]
-    );
+    const totalClients = await query(`SELECT COUNT(*) FROM clients WHERE company_id = $1`, [
+      companyId,
+    ]);
     const total = parseInt(totalClients.rows[0].count) || 1;
 
     const revenueResult = await query(
@@ -180,12 +194,17 @@ export class PlanService {
     const clientsCount = parseInt(plan.clients_count) || 0;
     const churnedCount = parseInt(plan.churned_count) || 0;
     const adoptionRate = ((clientsCount / total) * 100).toFixed(1);
-    const churnRate = clientsCount > 0 ? ((churnedCount / (clientsCount + churnedCount)) * 100).toFixed(1) : '0';
+    const churnRate =
+      clientsCount > 0 ? ((churnedCount / (clientsCount + churnedCount)) * 100).toFixed(1) : '0';
 
     // Calculate estimated margin (revenue - estimated costs)
-    const revenue = parseFloat(revenueResult.rows[0].revenue) || clientsCount * parseFloat(plan.monthly_price);
+    const revenue =
+      parseFloat(revenueResult.rows[0].revenue) || clientsCount * parseFloat(plan.monthly_price);
     const estimatedCostPerClient = parseFloat(plan.monthly_price) * 0.35; // 35% cost estimate
-    const estimatedMargin = ((1 - (estimatedCostPerClient / parseFloat(plan.monthly_price))) * 100).toFixed(1);
+    const estimatedMargin = (
+      (1 - estimatedCostPerClient / parseFloat(plan.monthly_price)) *
+      100
+    ).toFixed(1);
 
     // Default rate from overdue invoices
     const overdueResult = await query(
@@ -195,9 +214,10 @@ export class PlanService {
        WHERE c.plan_id = $1 AND i.status = 'atrasado'`,
       [planId]
     );
-    const defaultRate = clientsCount > 0
-      ? ((parseInt(overdueResult.rows[0].overdue_count) / clientsCount) * 100).toFixed(1)
-      : '0';
+    const defaultRate =
+      clientsCount > 0
+        ? ((parseInt(overdueResult.rows[0].overdue_count) / clientsCount) * 100).toFixed(1)
+        : '0';
 
     return {
       adoption_rate: parseFloat(adoptionRate),

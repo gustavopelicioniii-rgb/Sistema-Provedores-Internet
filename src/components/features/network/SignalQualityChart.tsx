@@ -1,5 +1,14 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from "recharts";
+import { GlassCard } from '@/components/shared/GlassCard';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+} from 'recharts';
 
 interface SignalData {
   id: string;
@@ -16,7 +25,16 @@ interface SignalQualityChartProps {
   isLoading: boolean;
 }
 
-const COLORS = ["#2563EB", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#06B6D4", "#EC4899", "#14B8A6"];
+const COLORS = [
+  '#2563EB',
+  '#8B5CF6',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#06B6D4',
+  '#EC4899',
+  '#14B8A6',
+];
 
 const GlassTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -25,7 +43,7 @@ const GlassTooltip = ({ active, payload, label }: any) => {
       <p className="text-xs font-semibold mb-1">{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} className="text-xs" style={{ color: p.color }}>
-          {p.name}: {typeof p.value === "number" ? `${p.value.toFixed(1)} dBm` : p.value}
+          {p.name}: {typeof p.value === 'number' ? `${p.value.toFixed(1)} dBm` : p.value}
         </p>
       ))}
     </div>
@@ -65,13 +83,28 @@ export function SignalQualityChart({ data, isLoading }: SignalQualityChartProps)
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
             <XAxis dataKey="name" fontSize={10} tickLine={false} axisLine={false} />
-            <YAxis fontSize={10} tickLine={false} axisLine={false}
-              domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+            <YAxis
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              domain={[0, 100]}
+              tickFormatter={(v) => `${v}%`}
+            />
             <Tooltip content={<GlassTooltip />} />
-            <ReferenceLine y={80} stroke="#94A3B8" strokeDasharray="5 5"
-              label={{ value: "Meta 80%", position: "right", fontSize: 10, fill: "#94A3B8" }} />
-            <Line type="monotone" dataKey="quality" stroke="#2563EB" strokeWidth={2.5}
-              dot={{ r: 4, fill: "#2563EB" }} name="Qualidade (%)" />
+            <ReferenceLine
+              y={80}
+              stroke="#94A3B8"
+              strokeDasharray="5 5"
+              label={{ value: 'Meta 80%', position: 'right', fontSize: 10, fill: '#94A3B8' }}
+            />
+            <Line
+              type="monotone"
+              dataKey="quality"
+              stroke="#2563EB"
+              strokeWidth={2.5}
+              dot={{ r: 4, fill: '#2563EB' }}
+              name="Qualidade (%)"
+            />
           </LineChart>
         </ResponsiveContainer>
 
@@ -79,15 +112,24 @@ export function SignalQualityChart({ data, isLoading }: SignalQualityChartProps)
         <div className="space-y-2 mt-4">
           {data.map((olt, i) => {
             const quality = olt.signal_quality || 0;
-            const color = quality >= 90 ? "#10B981" : quality >= 70 ? "#F59E0B" : "#EF4444";
+            const color = quality >= 90 ? '#10B981' : quality >= 70 ? '#F59E0B' : '#EF4444';
             return (
               <div key={olt.id} className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground w-28 truncate">{olt.name.substring(0, 20)}</span>
+                <span className="text-[10px] text-muted-foreground w-28 truncate">
+                  {olt.name.substring(0, 20)}
+                </span>
                 <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${quality}%`, background: color }} />
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${quality}%`, background: color }}
+                  />
                 </div>
-                <span className="text-[10px] font-medium w-8 text-right" style={{ color }}>{quality}%</span>
-                <span className="text-[9px] text-muted-foreground w-14 text-right">{olt.onu_count} ONUs</span>
+                <span className="text-[10px] font-medium w-8 text-right" style={{ color }}>
+                  {quality}%
+                </span>
+                <span className="text-[9px] text-muted-foreground w-14 text-right">
+                  {olt.onu_count} ONUs
+                </span>
               </div>
             );
           })}

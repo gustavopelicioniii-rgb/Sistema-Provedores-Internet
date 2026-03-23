@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { GlassCard } from "@/components/shared/GlassCard";
+import { useEffect, useRef } from 'react';
+import { GlassCard } from '@/components/shared/GlassCard';
 
 interface OLT {
   id: string;
@@ -21,10 +21,10 @@ interface OLTMapProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  online: "#10B981",
-  warning: "#F59E0B",
-  offline: "#EF4444",
-  maintenance: "#6B7280",
+  online: '#10B981',
+  warning: '#F59E0B',
+  offline: '#EF4444',
+  maintenance: '#6B7280',
 };
 
 export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
@@ -35,8 +35,8 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
   useEffect(() => {
     // Dynamic import for Leaflet to avoid SSR issues
     const initMap = async () => {
-      const L = await import("leaflet");
-      await import("leaflet/dist/leaflet.css");
+      const L = await import('leaflet');
+      await import('leaflet/dist/leaflet.css');
 
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
@@ -47,7 +47,7 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
       // Center on Sao Paulo area
       const map = L.map(mapRef.current).setView([-23.55, -46.63], 11);
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 18,
       }).addTo(map);
@@ -65,7 +65,7 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
         const isSelected = olt.id === selectedOLTId;
 
         const icon = L.divIcon({
-          className: "custom-olt-marker",
+          className: 'custom-olt-marker',
           html: `
             <div style="
               width: ${isSelected ? 28 : 22}px;
@@ -83,11 +83,11 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
         });
 
         const uptimeDays = olt.uptime_seconds ? Math.floor(olt.uptime_seconds / 86400) : 0;
-        const uptimeHours = olt.uptime_seconds ? Math.floor((olt.uptime_seconds % 86400) / 3600) : 0;
+        const uptimeHours = olt.uptime_seconds
+          ? Math.floor((olt.uptime_seconds % 86400) / 3600)
+          : 0;
 
-        const marker = L.marker([lat, lng], { icon })
-          .addTo(map)
-          .bindPopup(`
+        const marker = L.marker([lat, lng], { icon }).addTo(map).bindPopup(`
             <div style="min-width: 200px; font-family: system-ui, sans-serif;">
               <div style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">${olt.name}</div>
               <div style="display: grid; gap: 4px; font-size: 12px;">
@@ -101,15 +101,15 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
             </div>
           `);
 
-        marker.on("click", () => onOLTClick(olt));
+        marker.on('click', () => onOLTClick(olt));
         markersRef.current.push(marker);
       });
 
       // Fit bounds if we have markers
       if (olts.length > 0) {
-        const validOlts = olts.filter(o => o.latitude && o.longitude);
+        const validOlts = olts.filter((o) => o.latitude && o.longitude);
         if (validOlts.length > 1) {
-          const bounds = L.latLngBounds(validOlts.map(o => [o.latitude!, o.longitude!]));
+          const bounds = L.latLngBounds(validOlts.map((o) => [o.latitude!, o.longitude!]));
           map.fitBounds(bounds, { padding: [50, 50] });
         }
       }
@@ -134,7 +134,9 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="text-sm font-semibold">Mapa de OLTs</h3>
-            <p className="text-[10px] text-muted-foreground">Clique em um marcador para ver detalhes</p>
+            <p className="text-[10px] text-muted-foreground">
+              Clique em um marcador para ver detalhes
+            </p>
           </div>
           <div className="flex gap-3 text-xs text-muted-foreground">
             {Object.entries(STATUS_COLORS).map(([status, color]) => (
@@ -145,7 +147,11 @@ export function OLTMap({ olts, onOLTClick, selectedOLTId }: OLTMapProps) {
             ))}
           </div>
         </div>
-        <div ref={mapRef} className="h-[400px] rounded-xl overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.06)' }} />
+        <div
+          ref={mapRef}
+          className="h-[400px] rounded-xl overflow-hidden"
+          style={{ border: '1px solid rgba(0,0,0,0.06)' }}
+        />
       </div>
     </GlassCard>
   );

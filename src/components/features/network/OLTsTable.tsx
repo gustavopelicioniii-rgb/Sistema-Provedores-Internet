@@ -1,8 +1,20 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Activity, Users, AlertTriangle, Pencil } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, Activity, Users, AlertTriangle, Pencil } from 'lucide-react';
 
 interface OLT {
   id: string;
@@ -25,9 +37,15 @@ interface OLTsTableProps {
   onEdit: (olt: OLT) => void;
 }
 
-export function OLTsTable({ olts, onViewHealth, onViewClients, onViewIncidents, onEdit }: OLTsTableProps) {
+export function OLTsTable({
+  olts,
+  onViewHealth,
+  onViewClients,
+  onViewIncidents,
+  onEdit,
+}: OLTsTableProps) {
   const formatUptime = (seconds?: number) => {
-    if (!seconds) return "0d 0h";
+    if (!seconds) return '0d 0h';
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     return `${days}d ${hours}h`;
@@ -53,19 +71,28 @@ export function OLTsTable({ olts, onViewHealth, onViewClients, onViewIncidents, 
           {olts.map((olt) => (
             <TableRow key={olt.id} className="glass-table-row border-none">
               <TableCell className="font-medium text-sm">{olt.name}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">{olt.model || "-"}</TableCell>
+              <TableCell className="text-xs text-muted-foreground">{olt.model || '-'}</TableCell>
               <TableCell className="font-mono text-xs">{olt.ip_address}</TableCell>
-              <TableCell><StatusBadge status={olt.status} /></TableCell>
+              <TableCell>
+                <StatusBadge status={olt.status} />
+              </TableCell>
               <TableCell className="text-sm">{olt.clients_connected || 0}</TableCell>
               <TableCell className="text-sm">
-                <span className={`font-medium ${
-                  (olt.signal_quality || 0) >= 90 ? "text-success" :
-                  (olt.signal_quality || 0) >= 70 ? "text-amber-500" : "text-destructive"
-                }`}>
+                <span
+                  className={`font-medium ${
+                    (olt.signal_quality || 0) >= 90
+                      ? 'text-success'
+                      : (olt.signal_quality || 0) >= 70
+                        ? 'text-amber-500'
+                        : 'text-destructive'
+                  }`}
+                >
                   {olt.signal_quality || 0}%
                 </span>
               </TableCell>
-              <TableCell className="text-sm text-muted-foreground">{formatUptime(olt.uptime_seconds)}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {formatUptime(olt.uptime_seconds)}
+              </TableCell>
               <TableCell>
                 {(olt.active_incidents || 0) > 0 ? (
                   <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-destructive/10 text-destructive">
@@ -84,16 +111,20 @@ export function OLTsTable({ olts, onViewHealth, onViewClients, onViewIncidents, 
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onViewHealth(olt.id)}>
-                      <Activity className="h-4 w-4 mr-2" />Ver Health
+                      <Activity className="h-4 w-4 mr-2" />
+                      Ver Health
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onViewClients(olt.id)}>
-                      <Users className="h-4 w-4 mr-2" />Ver Clientes
+                      <Users className="h-4 w-4 mr-2" />
+                      Ver Clientes
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onViewIncidents(olt.id)}>
-                      <AlertTriangle className="h-4 w-4 mr-2" />Ver Incidentes
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Ver Incidentes
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit(olt)}>
-                      <Pencil className="h-4 w-4 mr-2" />Editar
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Editar
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -6,17 +6,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 export interface TableColumn<T> {
   key: keyof T | string;
@@ -51,16 +51,16 @@ export function DataTable<T extends Record<string, unknown>>({
   columns,
   data,
   searchable = false,
-  searchPlaceholder = "Pesquisar...",
+  searchPlaceholder = 'Pesquisar...',
   searchField,
   filterable = [],
   pagination = false,
   itemsPerPage = 10,
   onRowClick,
-  emptyMessage = "Nenhum dado encontrado",
+  emptyMessage = 'Nenhum dado encontrado',
   rowClassName,
 }: DataTableProps<T>) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -72,7 +72,7 @@ export function DataTable<T extends Record<string, unknown>>({
     if (searchable && searchTerm && searchField) {
       const lowerSearchTerm = searchTerm.toLowerCase();
       result = result.filter((row) => {
-        const fieldValue = String(row[searchField] || "").toLowerCase();
+        const fieldValue = String(row[searchField] || '').toLowerCase();
         return fieldValue.includes(lowerSearchTerm);
       });
     }
@@ -127,10 +127,8 @@ export function DataTable<T extends Record<string, unknown>>({
               {filterable.map((filter) => (
                 <Select
                   key={String(filter.field)}
-                  value={filters[String(filter.field)] || ""}
-                  onValueChange={(value) =>
-                    handleFilterChange(String(filter.field), value)
-                  }
+                  value={filters[String(filter.field)] || ''}
+                  onValueChange={(value) => handleFilterChange(String(filter.field), value)}
                 >
                   <SelectTrigger className="w-40">
                     <SelectValue placeholder={filter.label} />
@@ -182,18 +180,14 @@ export function DataTable<T extends Record<string, unknown>>({
                   key={rowIndex}
                   onClick={() => onRowClick?.(row, rowIndex)}
                   className={`border-border/50 transition-colors ${
-                    onRowClick ? "cursor-pointer hover:bg-accent/50" : ""
-                  } ${rowClassName?.(row, rowIndex) || ""}`}
+                    onRowClick ? 'cursor-pointer hover:bg-accent/50' : ''
+                  } ${rowClassName?.(row, rowIndex) || ''}`}
                 >
                   {columns.map((column) => (
                     <TableCell key={String(column.key)} className="py-3">
                       {column.render
-                        ? column.render(
-                            row[column.key as keyof T],
-                            row,
-                            rowIndex
-                          )
-                        : String(row[column.key as keyof T] || "-")}
+                        ? column.render(row[column.key as keyof T], row, rowIndex)
+                        : String(row[column.key as keyof T] || '-')}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -207,9 +201,9 @@ export function DataTable<T extends Record<string, unknown>>({
       {pagination && totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Mostrando {paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} a{" "}
-            {Math.min(currentPage * itemsPerPage, filteredData.length)} de{" "}
-            {filteredData.length} resultados
+            Mostrando {paginatedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} a{' '}
+            {Math.min(currentPage * itemsPerPage, filteredData.length)} de {filteredData.length}{' '}
+            resultados
           </div>
           <div className="flex gap-2">
             <Button
@@ -230,7 +224,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 return (
                   <Button
                     key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
+                    variant={currentPage === pageNum ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
                   >

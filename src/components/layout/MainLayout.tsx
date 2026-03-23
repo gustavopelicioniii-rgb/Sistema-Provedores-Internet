@@ -1,29 +1,29 @@
-import { Outlet, useLocation } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { GlassBackground } from "@/components/shared/GlassBackground";
-import { GlobalSearch } from "@/components/shared/GlobalSearch";
-import { Breadcrumb } from "@/components/shared/Breadcrumb";
+import { Outlet, useLocation } from 'react-router-dom';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { Bell } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { GlassBackground } from '@/components/shared/GlassBackground';
+import { GlobalSearch } from '@/components/shared/GlobalSearch';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
 
 const routeTitles: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/clients": "Clientes",
-  "/finance": "Financeiro",
-  "/network": "Rede e Conexões",
-  "/automations": "Automações",
-  "/tickets": "Tickets / Suporte",
-  "/ai-attendance": "IA & Atendimento",
-  "/plans": "Planos e Serviços",
-  "/reports": "Relatórios",
-  "/settings": "Configurações",
+  '/dashboard': 'Dashboard',
+  '/clients': 'Clientes',
+  '/finance': 'Financeiro',
+  '/network': 'Rede e Conexões',
+  '/automations': 'Automações',
+  '/tickets': 'Tickets / Suporte',
+  '/ai-attendance': 'IA & Atendimento',
+  '/plans': 'Planos e Serviços',
+  '/reports': 'Relatórios',
+  '/settings': 'Configurações',
 };
 
 export default function AppLayout() {
   const location = useLocation();
-  const basePath = "/" + location.pathname.split("/").filter(Boolean)[0];
-  const title = routeTitles[basePath] || "NetAdmin";
+  const basePath = '/' + location.pathname.split('/').filter(Boolean)[0];
+  const title = routeTitles[basePath] || 'NetAdmin';
 
   return (
     <SidebarProvider>
@@ -43,7 +43,9 @@ export default function AppLayout() {
               <GlobalSearch />
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-4 w-4" />
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center pulse-badge">3</span>
+                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center pulse-badge">
+                  3
+                </span>
               </Button>
             </div>
           </header>
