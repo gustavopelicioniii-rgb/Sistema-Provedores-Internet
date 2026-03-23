@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { KPICard } from "@/components/shared/KPICard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -79,6 +81,9 @@ export default function NetworkPage() {
   return (
     <PageWrapper>
       <div className="space-y-5">
+        {/* Page Header */}
+        <PageHeader title="Rede e Conexões" subtitle="Monitore equipamentos (OLTs) e incidentes em tempo real" />
+
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           {[
@@ -87,17 +92,15 @@ export default function NetworkPage() {
             { label: "Alertas ativos", value: alertCount, icon: AlertTriangle, bg: "rgba(239,68,68,0.1)", color: "#EF4444" },
             { label: "Incidentes", value: incidents.length, icon: Activity, bg: "rgba(245,158,11,0.1)", color: "#F59E0B" },
           ].map((s, i) => (
-            <GlassCard key={s.label} hover className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="p-4 flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: s.bg }}>
-                  <s.icon style={{ width: 18, height: 18, color: s.color }} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-muted-foreground">{s.label}</p>
-                  <p className="text-2xl font-bold">{s.value}</p>
-                </div>
-              </div>
-            </GlassCard>
+            <KPICard
+              key={s.label}
+              title={s.label}
+              value={String(s.value)}
+              icon={s.icon}
+              iconColor={s.color}
+              iconBg={s.bg}
+              className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}
+            />
           ))}
         </div>
 

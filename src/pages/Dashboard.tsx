@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { KPICard } from "@/components/shared/KPICard";
+import { ChartCard } from "@/components/shared/ChartCard";
 import {
   Users, DollarSign, Headphones, TrendingDown, Zap, ArrowUpRight, ArrowDownRight,
   RefreshCw, Maximize2, AlertTriangle, Wifi, WifiOff, Sparkles, ChevronRight,
@@ -144,32 +147,26 @@ export default function Dashboard() {
   return (
     <PageWrapper>
       <div className="space-y-5">
+        {/* Page Header */}
+        <PageHeader title="Dashboard Operacional" subtitle="Visão geral do seu negócio em tempo real" />
+
         {/* KPI Cards - 4 cols */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3">
           {kpis.slice(0, 8).map((kpi, i) => (
-            <GlassCard key={kpi.label} hover className="stagger-item cursor-pointer" style={{ animationDelay: `${i * 50}ms` }} onClick={() => openKpiDrawer(kpi)}>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-medium text-muted-foreground">{kpi.label}</span>
-                  <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: kpi.bg }}>
-                    <kpi.icon style={{ width: 16, height: 16, color: kpi.iconColor }} />
-                  </div>
-                </div>
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-xl font-bold leading-tight">{kpi.value}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-0.5">
-                      {kpi.positive
-                        ? <ArrowUpRight className="h-2.5 w-2.5 text-success" />
-                        : <ArrowDownRight className="h-2.5 w-2.5 text-destructive" />
-                      }
-                      <span className={kpi.positive ? "text-success" : "text-destructive"}>{kpi.change}</span>
-                    </p>
-                  </div>
-                  <MiniSparkline data={kpi.trend} color={kpi.iconColor} />
-                </div>
-              </div>
-            </GlassCard>
+            <button key={kpi.label} onClick={() => openKpiDrawer(kpi)} className="text-left">
+              <KPICard
+                title={kpi.label}
+                value={kpi.value}
+                icon={kpi.icon}
+                trend={{
+                  value: parseFloat(kpi.change.replace(/[^\d.-]/g, '')),
+                  direction: kpi.positive ? "up" : "down"
+                }}
+                iconColor={kpi.iconColor}
+                iconBg={kpi.bg}
+                className="stagger-item cursor-pointer" style={{ animationDelay: `${i * 50}ms` }}
+              />
+            </button>
           ))}
         </div>
 
@@ -342,260 +339,226 @@ export default function Dashboard() {
         {/* Charts 2x2 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Evolução de Clientes */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-1">
-                <div>
-                  <h3 className="text-sm font-semibold">Evolução de Clientes</h3>
-                  <p className="text-[10px] text-muted-foreground">Últimos 12 meses</p>
-                </div>
-                <Button variant="ghost" size="icon" className="h-7 w-7"><Maximize2 className="h-3.5 w-3.5" /></Button>
-              </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={mockChartClients}>
-                  <defs>
-                    <linearGradient id="clientGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#2563EB" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#2563EB" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(1)}k`} />
-                  <Tooltip content={<GlassTooltip />} />
-                  <Area type="monotone" dataKey="clients" stroke="#2563EB" strokeWidth={2} fill="url(#clientGradient)" name="Clientes" dot={{ r: 2, fill: "#2563EB" }} />
-                  <Line type="monotone" dataKey="meta" stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="5 5" dot={false} name="Meta" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassCard>
+          <ChartCard
+            title="Evolução de Clientes"
+            subtitle="Últimos 12 meses"
+            onExpand={() => navigate("/clients")}
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={mockChartClients}>
+                <defs>
+                  <linearGradient id="clientGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2563EB" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#2563EB" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(1)}k`} />
+                <Tooltip content={<GlassTooltip />} />
+                <Area type="monotone" dataKey="clients" stroke="#2563EB" strokeWidth={2} fill="url(#clientGradient)" name="Clientes" dot={{ r: 2, fill: "#2563EB" }} />
+                <Line type="monotone" dataKey="meta" stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="5 5" dot={false} name="Meta" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
           {/* Receita x Inadimplência */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-1">
-                <div>
-                  <h3 className="text-sm font-semibold">Receita x Inadimplência</h3>
-                  <p className="text-[10px] text-muted-foreground">Últimos 6 meses</p>
-                </div>
-                <Button variant="ghost" size="icon" className="h-7 w-7"><Maximize2 className="h-3.5 w-3.5" /></Button>
-              </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={mockChartRevenue}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip content={<GlassTooltip />} />
-                  <Bar dataKey="revenue" fill="#2563EB" radius={[6,6,0,0]} name="Receita" />
-                  <Bar dataKey="overdue" fill="#EF4444" fillOpacity={0.7} radius={[6,6,0,0]} name="Inadimplência" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassCard>
+          <ChartCard
+            title="Receita x Inadimplência"
+            subtitle="Últimos 6 meses"
+            onExpand={() => navigate("/finance")}
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={mockChartRevenue}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                <Tooltip content={<GlassTooltip />} />
+                <Bar dataKey="revenue" fill="#2563EB" radius={[6,6,0,0]} name="Receita" />
+                <Bar dataKey="overdue" fill="#EF4444" fillOpacity={0.7} radius={[6,6,0,0]} name="Inadimplência" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
           {/* Donut - Distribuição de Planos */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-1">
-                <div>
-                  <h3 className="text-sm font-semibold">Distribuição de Planos</h3>
-                  <p className="text-[10px] text-muted-foreground">Clientes por plano</p>
+          <ChartCard
+            title="Distribuição de Planos"
+            subtitle="Clientes por plano"
+          >
+            <div className="flex items-center gap-4">
+              <div className="relative flex-shrink-0" style={{ width: 160, height: 160 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={mockPlanDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={72} paddingAngle={3} dataKey="value">
+                      {mockPlanDistribution.map((entry) => (<Cell key={entry.name} fill={entry.color} />))}
+                    </Pie>
+                    <Tooltip content={<GlassTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-base font-bold">{totalClients.toLocaleString("pt-BR")}</span>
+                  <span className="text-[9px] text-muted-foreground">total</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="relative flex-shrink-0" style={{ width: 160, height: 160 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={mockPlanDistribution} cx="50%" cy="50%" innerRadius={50} outerRadius={72} paddingAngle={3} dataKey="value">
-                        {mockPlanDistribution.map((entry) => (<Cell key={entry.name} fill={entry.color} />))}
-                      </Pie>
-                      <Tooltip content={<GlassTooltip />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-base font-bold">{totalClients.toLocaleString("pt-BR")}</span>
-                    <span className="text-[9px] text-muted-foreground">total</span>
-                  </div>
-                </div>
-                <div className="flex-1 space-y-2">
-                  {mockPlanDistribution.map((plan) => (
-                    <div key={plan.name} className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: plan.color }} />
-                      <span className="text-[11px] flex-1">{plan.name}</span>
-                      <span className="text-[11px] font-medium">{((plan.value / totalClients) * 100).toFixed(0)}%</span>
-                      <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${(plan.value / totalClients) * 100}%`, background: plan.color }} />
-                      </div>
+              <div className="flex-1 space-y-2">
+                {mockPlanDistribution.map((plan) => (
+                  <div key={plan.name} className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: plan.color }} />
+                    <span className="text-[11px] flex-1">{plan.name}</span>
+                    <span className="text-[11px] font-medium">{((plan.value / totalClients) * 100).toFixed(0)}%</span>
+                    <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${(plan.value / totalClients) * 100}%`, background: plan.color }} />
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </GlassCard>
+          </ChartCard>
 
           {/* Receita Prevista vs Realizada */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-1">
-                <div>
-                  <h3 className="text-sm font-semibold">Receita Prevista vs Realizada</h3>
-                  <p className="text-[10px] text-muted-foreground">Últimos 6 meses</p>
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={revenuePrevVsReal}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip content={<GlassTooltip />} />
-                  <Bar dataKey="realizada" fill="#2563EB" radius={[4,4,0,0]} name="Realizada" />
-                  <Line type="monotone" dataKey="prevista" stroke="#8B5CF6" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 2 }} name="Prevista" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassCard>
+          <ChartCard
+            title="Receita Prevista vs Realizada"
+            subtitle="Últimos 6 meses"
+            onExpand={() => navigate("/finance")}
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <ComposedChart data={revenuePrevVsReal}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                <Tooltip content={<GlassTooltip />} />
+                <Bar dataKey="realizada" fill="#2563EB" radius={[4,4,0,0]} name="Realizada" />
+                <Line type="monotone" dataKey="prevista" stroke="#8B5CF6" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 2 }} name="Prevista" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </div>
 
         {/* Bottom row - Churn + Tickets + Heatmap */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Churn x Ativações */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-1">
-                <div>
-                  <h3 className="text-sm font-semibold">Churn x Ativações</h3>
-                  <p className="text-[10px] text-muted-foreground">Crescimento líquido</p>
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={180}>
-                <ComposedChart data={mockChurnActivations}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                  <XAxis dataKey="month" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={10} tickLine={false} axisLine={false} />
-                  <Tooltip content={<GlassTooltip />} />
-                  <Bar dataKey="activations" fill="#10B981" radius={[3,3,0,0]} name="Ativações" />
-                  <Bar dataKey="cancellations" fill="#EF4444" fillOpacity={0.7} radius={[3,3,0,0]} name="Cancelamentos" />
-                  <Line type="monotone" dataKey="netGrowth" stroke="#2563EB" strokeWidth={2} dot={{ r: 2, fill: "#2563EB" }} name="Crescimento" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassCard>
+          <ChartCard
+            title="Churn x Ativações"
+            subtitle="Crescimento líquido"
+            minHeight="min-h-72"
+          >
+            <ResponsiveContainer width="100%" height={180}>
+              <ComposedChart data={mockChurnActivations}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="month" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis fontSize={10} tickLine={false} axisLine={false} />
+                <Tooltip content={<GlassTooltip />} />
+                <Bar dataKey="activations" fill="#10B981" radius={[3,3,0,0]} name="Ativações" />
+                <Bar dataKey="cancellations" fill="#EF4444" fillOpacity={0.7} radius={[3,3,0,0]} name="Cancelamentos" />
+                <Line type="monotone" dataKey="netGrowth" stroke="#2563EB" strokeWidth={2} dot={{ r: 2, fill: "#2563EB" }} name="Crescimento" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
           {/* Últimos Tickets */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold">Últimos Tickets</h3>
-                <Link to="/tickets" className="text-[10px] text-primary hover:underline font-medium">Ver todos →</Link>
-              </div>
-              <div className="space-y-2">
-                {mockTickets.slice(0, 5).map((t) => (
-                  <div key={t.id} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-accent/40 transition-colors">
-                    <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[9px] font-bold text-primary">{t.client.split(" ").map(w => w[0]).slice(0,2).join("")}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{t.subject}</p>
-                      <p className="text-[10px] text-muted-foreground">{t.client}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                      <StatusBadge status={t.priority} />
-                      <span className="text-[9px] text-muted-foreground">{t.timeAgo}</span>
-                    </div>
+          <ChartCard
+            title="Últimos Tickets"
+            minHeight="min-h-72"
+          >
+            <div className="space-y-2">
+              {mockTickets.slice(0, 5).map((t) => (
+                <div key={t.id} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-accent/40 transition-colors">
+                  <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[9px] font-bold text-primary">{t.client.split(" ").map(w => w[0]).slice(0,2).join("")}</span>
                   </div>
-                ))}
-              </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{t.subject}</p>
+                    <p className="text-[10px] text-muted-foreground">{t.client}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                    <StatusBadge status={t.priority} />
+                    <span className="text-[9px] text-muted-foreground">{t.timeAgo}</span>
+                  </div>
+                </div>
+              ))}
+              <Link to="/tickets" className="text-[10px] text-primary hover:underline font-medium inline-block mt-2">Ver todos →</Link>
             </div>
-          </GlassCard>
+          </ChartCard>
 
           {/* Heatmap */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="mb-3">
-                <h3 className="text-sm font-semibold">Mapa de Calor</h3>
-                <p className="text-[10px] text-muted-foreground">Volume de tickets por dia/hora</p>
-              </div>
-              <div className="space-y-1">
-                {days.map((day) => (
-                  <div key={day} className="flex items-center gap-1">
-                    <span className="text-[9px] text-muted-foreground w-6 flex-shrink-0">{day}</span>
-                    <div className="flex gap-px flex-1">
-                      {Array.from({ length: 24 }, (_, h) => {
-                        const d = mockHeatmapData.find((x) => x.day === day && x.hour === h);
-                        return (
-                          <div key={h} className="flex-1 h-3.5 rounded-sm cursor-pointer transition-opacity hover:opacity-80"
-                            style={{ background: getHeatColor(d?.value || 0), minWidth: 4 }}
-                            title={`${day}, ${h}h — ${d?.value || 0} tickets`}
-                          />
-                        );
-                      })}
-                    </div>
+          <ChartCard
+            title="Mapa de Calor"
+            subtitle="Volume de tickets por dia/hora"
+            minHeight="min-h-72"
+          >
+            <div className="space-y-1">
+              {days.map((day) => (
+                <div key={day} className="flex items-center gap-1">
+                  <span className="text-[9px] text-muted-foreground w-6 flex-shrink-0">{day}</span>
+                  <div className="flex gap-px flex-1">
+                    {Array.from({ length: 24 }, (_, h) => {
+                      const d = mockHeatmapData.find((x) => x.day === day && x.hour === h);
+                      return (
+                        <div key={h} className="flex-1 h-3.5 rounded-sm cursor-pointer transition-opacity hover:opacity-80"
+                          style={{ background: getHeatColor(d?.value || 0), minWidth: 4 }}
+                          title={`${day}, ${h}h — ${d?.value || 0} tickets`}
+                        />
+                      );
+                    })}
                   </div>
-                ))}
-                <div className="flex justify-between mt-1 text-[8px] text-muted-foreground pl-7">
-                  <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>
                 </div>
+              ))}
+              <div className="flex justify-between mt-1 text-[8px] text-muted-foreground pl-7">
+                <span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span>
               </div>
             </div>
-          </GlassCard>
+          </ChartCard>
         </div>
 
         {/* Automações + Incidentes row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Automações Ativas */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold">Automações Ativas</h3>
-                <Link to="/automations" className="text-[10px] text-primary hover:underline font-medium">Configurar →</Link>
-              </div>
-              <div className="space-y-1.5">
-                {mockAutomations.slice(0, 5).map((a) => (
-                  <div key={a.id} className="flex items-center gap-2.5 p-1.5 rounded-lg">
-                    <div className={`h-2 w-2 rounded-full flex-shrink-0 ${a.active ? "bg-success" : "bg-muted-foreground/30"}`} />
-                    <span className="text-xs flex-1">{a.name}</span>
-                    <span className="text-[10px] text-muted-foreground">{a.metric.split(" ")[0]} {a.metric.split(" ")[1]}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3 p-2.5 rounded-xl" style={{ background: 'rgba(59,130,246,0.05)' }}>
-                <p className="text-xs font-medium">124 automações executadas hoje</p>
-                <p className="text-[10px] text-muted-foreground">+18% vs ontem</p>
-              </div>
+          <ChartCard
+            title="Automações Ativas"
+            minHeight="min-h-fit"
+          >
+            <div className="space-y-1.5">
+              {mockAutomations.slice(0, 5).map((a) => (
+                <div key={a.id} className="flex items-center gap-2.5 p-1.5 rounded-lg">
+                  <div className={`h-2 w-2 rounded-full flex-shrink-0 ${a.active ? "bg-success" : "bg-muted-foreground/30"}`} />
+                  <span className="text-xs flex-1">{a.name}</span>
+                  <span className="text-[10px] text-muted-foreground">{a.metric.split(" ")[0]} {a.metric.split(" ")[1]}</span>
+                </div>
+              ))}
             </div>
-          </GlassCard>
+            <div className="mt-3 p-2.5 rounded-xl" style={{ background: 'rgba(59,130,246,0.05)' }}>
+              <p className="text-xs font-medium">124 automações executadas hoje</p>
+              <p className="text-[10px] text-muted-foreground">+18% vs ontem</p>
+            </div>
+            <Link to="/automations" className="text-[10px] text-primary hover:underline font-medium inline-block mt-2">Configurar →</Link>
+          </ChartCard>
 
           {/* Incidentes de Rede */}
-          <GlassCard hover>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <WifiOff className="h-4 w-4 text-amber-500" />
-                  <h3 className="text-sm font-semibold">Incidentes de Rede</h3>
+          <ChartCard
+            title="Incidentes de Rede"
+            minHeight="min-h-fit"
+          >
+            <div className="space-y-2">
+              <div className="p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">OLT Huawei MA5608T — Alerta</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.15)", color: "#D97706" }}>Em andamento</span>
                 </div>
-                <Link to="/network" className="text-[10px] text-primary hover:underline font-medium">Ver rede →</Link>
+                <p className="text-[10px] text-muted-foreground">64 clientes impactados • Desde 21/03 às 10:15 • 4h12min</p>
+                <div className="flex gap-2 mt-2">
+                  <Button variant="outline" size="sm" className="h-6 text-[10px]" style={{ borderRadius: 8 }}>Notificar clientes</Button>
+                  <Button variant="outline" size="sm" className="h-6 text-[10px]" style={{ borderRadius: 8 }}>Ver detalhes</Button>
+                </div>
               </div>
-              <div className="space-y-2">
-                <div className="p-3 rounded-xl" style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)" }}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium">OLT Huawei MA5608T — Alerta</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.15)", color: "#D97706" }}>Em andamento</span>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground">64 clientes impactados • Desde 21/03 às 10:15 • 4h12min</p>
-                  <div className="flex gap-2 mt-2">
-                    <Button variant="outline" size="sm" className="h-6 text-[10px]" style={{ borderRadius: 8 }}>Notificar clientes</Button>
-                    <Button variant="outline" size="sm" className="h-6 text-[10px]" style={{ borderRadius: 8 }}>Ver detalhes</Button>
-                  </div>
-                </div>
-                <div className="p-2.5 rounded-xl" style={{ background: "rgba(16,185,129,0.05)" }}>
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-success" />
-                    <span className="text-xs">Switch S5720 — Resolvido há 2h</span>
-                  </div>
+              <div className="p-2.5 rounded-xl" style={{ background: "rgba(16,185,129,0.05)" }}>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-success" />
+                  <span className="text-xs">Switch S5720 — Resolvido há 2h</span>
                 </div>
               </div>
             </div>
-          </GlassCard>
+            <Link to="/network" className="text-[10px] text-primary hover:underline font-medium inline-block mt-2">Ver rede →</Link>
+          </ChartCard>
         </div>
       </div>
 

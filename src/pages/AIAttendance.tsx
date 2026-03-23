@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { KPICard } from "@/components/shared/KPICard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -140,23 +142,18 @@ export default function AIAttendance() {
   return (
     <PageWrapper>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.1)' }}>
-              <Sparkles style={{ width: 22, height: 22, color: '#8B5CF6' }} />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold">IA & Atendimento</h2>
-              <p className="text-xs text-muted-foreground">Inteligência artificial aplicada ao atendimento e operações</p>
-            </div>
-          </div>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" style={{ borderRadius: 10 }}>
-                <Settings2 className="h-4 w-4 mr-2" /> Configurar assistente
-              </Button>
-            </SheetTrigger>
+        {/* Page Header */}
+        <PageHeader
+          title="IA & Atendimento"
+          subtitle="Inteligência artificial aplicada ao atendimento e operações"
+          actions={
+          <>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" style={{ borderRadius: 10 }}>
+                  <Settings2 className="h-4 w-4 mr-2" /> Configurar assistente
+                </Button>
+              </SheetTrigger>
             <SheetContent className="glass-card border-none w-[420px] sm:w-[500px] overflow-y-auto">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
@@ -221,27 +218,27 @@ export default function AIAttendance() {
                 <Button className="w-full" style={{ borderRadius: 10 }}>Salvar configurações</Button>
               </div>
             </SheetContent>
-          </Sheet>
-        </div>
+            </Sheet>
+            </>
+          }
+        />
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {aiKpis.map((kpi, i) => (
-            <GlassCard key={kpi.label} hover className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-medium text-muted-foreground leading-tight">{kpi.label}</span>
-                  <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: kpi.bg }}>
-                    <kpi.icon style={{ width: 16, height: 16, color: kpi.iconColor }} />
-                  </div>
-                </div>
-                <p className="text-xl font-bold">{kpi.value}</p>
-                <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-0.5">
-                  <ArrowUpRight className="h-2.5 w-2.5 text-success" />
-                  <span className="text-success">{kpi.change}</span>
-                </p>
-              </div>
-            </GlassCard>
+            <KPICard
+              key={kpi.label}
+              title={kpi.label}
+              value={kpi.value}
+              icon={kpi.icon}
+              trend={{
+                value: parseFloat(kpi.change.replace(/[^\d.-]/g, '')),
+                direction: "up"
+              }}
+              iconColor={kpi.iconColor}
+              iconBg={kpi.bg}
+              className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}
+            />
           ))}
         </div>
 

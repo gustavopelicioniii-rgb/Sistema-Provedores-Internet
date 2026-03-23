@@ -1,69 +1,75 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description: string;
-  confirmText: string;
-  onConfirm: () => void;
-  destructive?: boolean;
+  description?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: () => void | Promise<void>;
+  variant?: "danger" | "default";
+  isLoading?: boolean;
 }
 
-export function ConfirmDialog({ open, onOpenChange, title, description, confirmText, onConfirm, destructive = true }: ConfirmDialogProps) {
-  const [typed, setTyped] = useState("");
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = "Confirmar",
+  cancelLabel = "Cancelar",
+  onConfirm,
+  variant = "default",
+  isLoading = false,
+}: ConfirmDialogProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleConfirm = () => {
-    if (typed === confirmText) {
-      onConfirm();
+  const handleConfirm = async () => {
+    setIsProcessing(true);
+    try {
+      await onConfirm();
       onOpenChange(false);
-      setTyped("");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setTyped(""); }}>
-      <DialogContent className="glass-card border-none max-w-md">
-        <DialogHeader>
-          <div className="flex items-center gap-3">
-            {destructive && (
-              <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(239,68,68,0.1)" }}>
-                <AlertTriangle className="h-5 w-5 text-destructive" />
-              </div>
-            )}
-            <div>
-              <DialogTitle>{title}</DialogTitle>
-              <DialogDescription className="mt-1">{description}</DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-        <div className="space-y-3 py-2">
-          <p className="text-sm">
-            Para confirmar, digite <span className="font-bold text-destructive">{confirmText}</span>:
-          </p>
-          <Input
-            value={typed}
-            onChange={(e) => setTyped(e.target.value)}
-            placeholder={confirmText}
-            style={{ borderRadius: 10 }}
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)} style={{ borderRadius: 10 }}>Cancelar</Button>
-          <Button
-            variant="destructive"
-            disabled={typed !== confirmText}
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {description && (
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          )}
+        </AlertDialogHeader>
+        <div className="flex gap-3 justify-end">
+          <AlertDialogCancel disabled={isProcessing || isLoading}>
+            {cancelLabel}
+          </AlertDialogCancel>
+          <AlertDialogAction
             onClick={handleConfirm}
-            style={{ borderRadius: 10 }}
+            disabled={isProcessing || isLoading}
+            className={
+              variant === "danger"
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : ""
+            }
           >
-            Confirmar exclusão
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {isProcessing || isLoading ? "Processando..." : confirmLabel}
+          </AlertDialogAction>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

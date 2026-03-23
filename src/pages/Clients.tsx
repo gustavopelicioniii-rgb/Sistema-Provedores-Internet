@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { KPICard } from "@/components/shared/KPICard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,20 +80,21 @@ export default function Clients() {
   return (
     <PageWrapper>
       <div className="space-y-4">
-        {/* Mini KPI pills */}
-        <div className="flex flex-wrap gap-2">
+        {/* Page Header */}
+        <PageHeader title="Clientes" subtitle="Gerencie seus clientes e acompanhe o status de cada um" />
+
+        {/* KPI Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {stats.map((s) => (
-            <button
-              key={s.label}
-              onClick={() => setStatusFilter(s.filter)}
-              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                statusFilter === s.filter
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "glass-card hover:shadow-md"
-              }`}
-            >
-              <s.icon className="h-3.5 w-3.5" />
-              {s.label}: <span className="font-bold">{s.value}</span>
+            <button key={s.label} onClick={() => setStatusFilter(s.filter)} className="text-left">
+              <KPICard
+                title={s.label}
+                value={s.value}
+                icon={s.icon}
+                iconColor={statusFilter === s.filter ? "#2563EB" : "#6B7280"}
+                iconBg={statusFilter === s.filter ? "rgba(37,99,235,0.1)" : "rgba(107,127,128,0.1)"}
+                className={`cursor-pointer transition-all ${statusFilter === s.filter ? "ring-2 ring-primary" : ""}`}
+              />
             </button>
           ))}
         </div>

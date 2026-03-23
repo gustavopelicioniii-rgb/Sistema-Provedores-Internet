@@ -1,46 +1,64 @@
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
-type StatusType = "ativo" | "suspenso" | "cancelado" | "inativo" | "pago" | "pendente" | "atrasado" | "aberto" | "em andamento" | "aguardando cliente" | "resolvido" | "emitida" | "cancelada" | "online" | "offline" | "warning" | "baixa" | "média" | "alta" | "crítica";
+type StatusVariant = "client" | "invoice" | "ticket" | "network" | "plan" | "automation";
 
-const statusConfig: Record<string, { label: string; bg: string; text: string; bold?: boolean }> = {
-  ativo:     { label: "Ativo",     bg: "#ECFDF5", text: "#059669" },
-  pago:      { label: "Pago",      bg: "#ECFDF5", text: "#059669" },
-  online:    { label: "Online",    bg: "#ECFDF5", text: "#059669" },
-  emitida:   { label: "Emitida",   bg: "#ECFDF5", text: "#059669" },
-  resolvido: { label: "Resolvido", bg: "#ECFDF5", text: "#059669" },
+interface StatusBadgeProps {
+  status: string;
+  variant?: StatusVariant;
+  className?: string;
+}
 
-  pendente:        { label: "Pendente",        bg: "#FEF3C7", text: "#D97706" },
-  "em andamento":  { label: "Em andamento",    bg: "#FEF3C7", text: "#D97706" },
-  "aguardando cliente": { label: "Aguardando", bg: "#FEF3C7", text: "#D97706" },
-  warning:         { label: "Alerta",          bg: "#FEF3C7", text: "#D97706" },
-  suspenso:        { label: "Suspenso",        bg: "#FEE2E2", text: "#DC2626" },
-  média:           { label: "Média",           bg: "#FEF3C7", text: "#D97706" },
+const STATUS_COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
+  // Green (Success)
+  ativo: { bg: "bg-emerald-50 dark:bg-emerald-950", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800" },
+  pago: { bg: "bg-emerald-50 dark:bg-emerald-950", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800" },
+  online: { bg: "bg-emerald-50 dark:bg-emerald-950", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800" },
+  resolvido: { bg: "bg-emerald-50 dark:bg-emerald-950", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800" },
+  emitida: { bg: "bg-emerald-50 dark:bg-emerald-950", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-200 dark:border-emerald-800" },
 
-  atrasado:  { label: "Atrasado", bg: "#FEE2E2", text: "#DC2626" },
-  offline:   { label: "Offline",  bg: "#FEE2E2", text: "#DC2626" },
-  alta:      { label: "Alta",     bg: "#FEE2E2", text: "#DC2626" },
-  aberto:    { label: "Aberto",   bg: "#DBEAFE", text: "#2563EB" },
+  // Yellow (Warning)
+  pendente: { bg: "bg-amber-50 dark:bg-amber-950", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800" },
+  em_andamento: { bg: "bg-amber-50 dark:bg-amber-950", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800" },
+  aguardando: { bg: "bg-amber-50 dark:bg-amber-950", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800" },
+  alerta: { bg: "bg-amber-50 dark:bg-amber-950", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800" },
+  media: { bg: "bg-amber-50 dark:bg-amber-950", text: "text-amber-700 dark:text-amber-300", border: "border-amber-200 dark:border-amber-800" },
 
-  cancelado: { label: "Cancelado", bg: "#F1F5F9", text: "#64748B" },
-  cancelada: { label: "Cancelada", bg: "#F1F5F9", text: "#64748B" },
-  inativo:   { label: "Inativo",   bg: "#F1F5F9", text: "#64748B" },
-  baixa:     { label: "Baixa",     bg: "#F1F5F9", text: "#64748B" },
+  // Red (Error/Warning)
+  atrasado: { bg: "bg-red-50 dark:bg-red-950", text: "text-red-700 dark:text-red-300", border: "border-red-200 dark:border-red-800" },
+  suspenso: { bg: "bg-red-50 dark:bg-red-950", text: "text-red-700 dark:text-red-300", border: "border-red-200 dark:border-red-800" },
+  offline: { bg: "bg-red-50 dark:bg-red-950", text: "text-red-700 dark:text-red-300", border: "border-red-200 dark:border-red-800" },
+  alta: { bg: "bg-red-50 dark:bg-red-950", text: "text-red-700 dark:text-red-300", border: "border-red-200 dark:border-red-800" },
+  critica: { bg: "bg-red-900 dark:bg-red-800", text: "text-red-100 dark:text-red-200", border: "border-red-700 dark:border-red-600" },
 
-  crítica:   { label: "Crítica", bg: "#DC2626", text: "#FFFFFF", bold: true },
+  // Gray (Disabled/Cancelled)
+  cancelado: { bg: "bg-slate-100 dark:bg-slate-900", text: "text-slate-600 dark:text-slate-400", border: "border-slate-300 dark:border-slate-700" },
+  inativo: { bg: "bg-slate-100 dark:bg-slate-900", text: "text-slate-600 dark:text-slate-400", border: "border-slate-300 dark:border-slate-700" },
+  cancelada: { bg: "bg-slate-100 dark:bg-slate-900", text: "text-slate-600 dark:text-slate-400", border: "border-slate-300 dark:border-slate-700" },
 };
 
-export function StatusBadge({ status }: { status: string }) {
-  const config = statusConfig[status] || { label: status, bg: "#F1F5F9", text: "#64748B" };
+export function StatusBadge({
+  status,
+  variant,
+  className = "",
+}: StatusBadgeProps) {
+  const statusKey = status.toLowerCase();
+  const colorConfig = STATUS_COLOR_MAP[statusKey] || STATUS_COLOR_MAP["pendente"];
+
+  const displayLabel = status
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  const isCritical = statusKey === "critica";
+
   return (
-    <span
-      className={cn("inline-flex items-center px-2.5 py-0.5 text-xs font-medium", config.bold && "font-bold")}
-      style={{
-        background: config.bg,
-        color: config.text,
-        borderRadius: 9999,
-      }}
+    <Badge
+      className={`${colorConfig.bg} ${colorConfig.text} border ${colorConfig.border} cursor-default font-medium transition-all hover:shadow-md ${
+        isCritical ? "text-sm font-bold" : ""
+      } ${className}`}
+      variant="outline"
     >
-      {config.label}
-    </span>
+      {displayLabel}
+    </Badge>
   );
 }

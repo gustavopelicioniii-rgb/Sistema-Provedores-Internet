@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { KPICard } from "@/components/shared/KPICard";
+import { ChartCard } from "@/components/shared/ChartCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -74,19 +77,21 @@ export default function Finance() {
   return (
     <PageWrapper>
       <div className="space-y-5">
+        {/* Page Header */}
+        <PageHeader title="Financeiro" subtitle="Acompanhe faturas, contas a pagar e fluxo de caixa" />
+
+        {/* Summary KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {summary.map((s, i) => (
-            <GlassCard key={s.label} hover className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-medium text-muted-foreground">{s.label}</span>
-                  <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: s.bg }}>
-                    <s.icon style={{ width: 16, height: 16, color: s.iconColor }} />
-                  </div>
-                </div>
-                <p className="text-xl font-bold">{s.value}</p>
-              </div>
-            </GlassCard>
+            <KPICard
+              key={s.label}
+              title={s.label}
+              value={s.value}
+              icon={s.icon}
+              iconColor={s.iconColor}
+              iconBg={s.bg}
+              className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}
+            />
           ))}
         </div>
 
@@ -186,168 +191,167 @@ export default function Finance() {
 
           {/* COBRANÇA INTELIGENTE */}
           <TabsContent value="cobranca" className="mt-4 space-y-4">
-            <GlassCard>
-              <div className="p-5">
-                <h3 className="text-sm font-semibold mb-1">Régua de Cobrança Ativa</h3>
-                <p className="text-[10px] text-muted-foreground mb-4">Conversão por etapa do escalonamento automático</p>
-
-                {/* Visual ruler */}
-                <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-2">
-                  {billingRuler.map((step, i) => (
-                    <div key={step.stage} className="flex items-center">
-                      <div className="flex flex-col items-center min-w-[100px]">
-                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                          i === 0 ? "bg-blue-500" : i <= 2 ? "bg-amber-500" : "bg-red-500"
-                        }`}>
-                          {step.stage}
-                        </div>
-                        <span className="text-[10px] font-medium mt-1">{step.label}</span>
-                        <span className="text-[9px] text-muted-foreground">{step.channel}</span>
-                        <span className="text-[10px] font-bold mt-0.5" style={{ color: "#10B981" }}>{step.rate}</span>
+            <ChartCard
+              title="Régua de Cobrança Ativa"
+              subtitle="Conversão por etapa do escalonamento automático"
+              minHeight="min-h-fit"
+            >
+              {/* Visual ruler */}
+              <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-2">
+                {billingRuler.map((step, i) => (
+                  <div key={step.stage} className="flex items-center">
+                    <div className="flex flex-col items-center min-w-[100px]">
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                        i === 0 ? "bg-blue-500" : i <= 2 ? "bg-amber-500" : "bg-red-500"
+                      }`}>
+                        {step.stage}
                       </div>
-                      {i < billingRuler.length - 1 && (
-                        <div className="h-0.5 w-8 bg-border mx-1" />
-                      )}
+                      <span className="text-[10px] font-medium mt-1">{step.label}</span>
+                      <span className="text-[9px] text-muted-foreground">{step.channel}</span>
+                      <span className="text-[10px] font-bold mt-0.5" style={{ color: "#10B981" }}>{step.rate}</span>
                     </div>
-                  ))}
-                </div>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-none">
-                      <TableHead className="glass-table-header">Etapa</TableHead>
-                      <TableHead className="glass-table-header">Enviados</TableHead>
-                      <TableHead className="glass-table-header">Convertidos</TableHead>
-                      <TableHead className="glass-table-header">Taxa</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {billingRuler.map((step) => (
-                      <TableRow key={step.stage} className="glass-table-row border-none">
-                        <TableCell className="text-xs font-medium">{step.stage} — {step.label}</TableCell>
-                        <TableCell className="text-xs">{step.sent}</TableCell>
-                        <TableCell className="text-xs">{step.converted}</TableCell>
-                        <TableCell className="text-xs font-semibold" style={{ color: "#10B981" }}>{step.rate}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    {i < billingRuler.length - 1 && (
+                      <div className="h-0.5 w-8 bg-border mx-1" />
+                    )}
+                  </div>
+                ))}
               </div>
-            </GlassCard>
+
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-none">
+                    <TableHead className="glass-table-header">Etapa</TableHead>
+                    <TableHead className="glass-table-header">Enviados</TableHead>
+                    <TableHead className="glass-table-header">Convertidos</TableHead>
+                    <TableHead className="glass-table-header">Taxa</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {billingRuler.map((step) => (
+                    <TableRow key={step.stage} className="glass-table-row border-none">
+                      <TableCell className="text-xs font-medium">{step.stage} — {step.label}</TableCell>
+                      <TableCell className="text-xs">{step.sent}</TableCell>
+                      <TableCell className="text-xs">{step.converted}</TableCell>
+                      <TableCell className="text-xs font-semibold" style={{ color: "#10B981" }}>{step.rate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ChartCard>
 
             {/* Aging */}
-            <GlassCard>
-              <div className="p-5">
-                <h3 className="text-sm font-semibold mb-1">Aging da Inadimplência</h3>
-                <p className="text-[10px] text-muted-foreground mb-3">Distribuição por faixa de atraso</p>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={agingData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                    <XAxis dataKey="range" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={10} tickLine={false} axisLine={false} />
-                    <Tooltip content={<GlassTooltip />} />
-                    <Bar dataKey="amount" fill="#EF4444" radius={[4,4,0,0]} name="Valor (R$)" fillOpacity={0.8} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </GlassCard>
+            <ChartCard
+              title="Aging da Inadimplência"
+              subtitle="Distribuição por faixa de atraso"
+              minHeight="min-h-72"
+            >
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={agingData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                  <XAxis dataKey="range" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis fontSize={10} tickLine={false} axisLine={false} />
+                  <Tooltip content={<GlassTooltip />} />
+                  <Bar dataKey="amount" fill="#EF4444" radius={[4,4,0,0]} name="Valor (R$)" fillOpacity={0.8} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
           </TabsContent>
 
           {/* FLUXO DE CAIXA */}
           <TabsContent value="fluxo" className="mt-4">
-            <GlassCard>
-              <div className="p-5">
-                <h3 className="text-sm font-semibold">Fluxo de Caixa — Últimos 6 meses</h3>
-                <p className="text-[10px] text-muted-foreground">Entradas, saídas, saldo acumulado e receita prevista</p>
-                <ResponsiveContainer width="100%" height={280} className="mt-3">
-                  <ComposedChart data={cashflowWithBalance}>
-                    <defs>
-                      <linearGradient id="inflowGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} /><stop offset="100%" stopColor="#10B981" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="outflowGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#EF4444" stopOpacity={0.3} /><stop offset="100%" stopColor="#EF4444" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                    <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                    <Tooltip content={<GlassTooltip />} />
-                    <Area type="monotone" dataKey="inflow" stroke="#10B981" fill="url(#inflowGrad)" strokeWidth={2} name="Entradas" />
-                    <Area type="monotone" dataKey="outflow" stroke="#EF4444" fill="url(#outflowGrad)" strokeWidth={2} name="Saídas" />
-                    <Line type="monotone" dataKey="balance" stroke="#2563EB" strokeWidth={2.5} dot={{ r: 3 }} name="Saldo acumulado" />
-                    <Line type="monotone" dataKey="prevista" stroke="#8B5CF6" strokeWidth={1.5} strokeDasharray="5 5" dot={false} name="Receita prevista" />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </GlassCard>
+            <ChartCard
+              title="Fluxo de Caixa — Últimos 6 meses"
+              subtitle="Entradas, saídas, saldo acumulado e receita prevista"
+              minHeight="min-h-96"
+            >
+              <ResponsiveContainer width="100%" height={280}>
+                <ComposedChart data={cashflowWithBalance}>
+                  <defs>
+                    <linearGradient id="inflowGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.3} /><stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="outflowGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#EF4444" stopOpacity={0.3} /><stop offset="100%" stopColor="#EF4444" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip content={<GlassTooltip />} />
+                  <Area type="monotone" dataKey="inflow" stroke="#10B981" fill="url(#inflowGrad)" strokeWidth={2} name="Entradas" />
+                  <Area type="monotone" dataKey="outflow" stroke="#EF4444" fill="url(#outflowGrad)" strokeWidth={2} name="Saídas" />
+                  <Line type="monotone" dataKey="balance" stroke="#2563EB" strokeWidth={2.5} dot={{ r: 3 }} name="Saldo acumulado" />
+                  <Line type="monotone" dataKey="prevista" stroke="#8B5CF6" strokeWidth={1.5} strokeDasharray="5 5" dot={false} name="Receita prevista" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </ChartCard>
           </TabsContent>
 
           {/* PREVISÃO DE RECEITA */}
           <TabsContent value="previsao" className="mt-4 space-y-4">
-            <GlassCard>
-              <div className="p-5">
-                <h3 className="text-sm font-semibold">Receita Prevista vs Realizada</h3>
-                <p className="text-[10px] text-muted-foreground">Projeção para os próximos 3 meses</p>
-                <ResponsiveContainer width="100%" height={250} className="mt-3">
-                  <ComposedChart data={revenueForecast}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                    <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-                    <Tooltip content={<GlassTooltip />} />
-                    <Bar dataKey="realizada" fill="#2563EB" radius={[4,4,0,0]} name="Realizada" />
-                    <Line type="monotone" dataKey="prevista" stroke="#8B5CF6" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} name="Prevista" />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </GlassCard>
+            <ChartCard
+              title="Receita Prevista vs Realizada"
+              subtitle="Projeção para os próximos 3 meses"
+              minHeight="min-h-80"
+            >
+              <ResponsiveContainer width="100%" height={250}>
+                <ComposedChart data={revenueForecast}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                  <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip content={<GlassTooltip />} />
+                  <Bar dataKey="realizada" fill="#2563EB" radius={[4,4,0,0]} name="Realizada" />
+                  <Line type="monotone" dataKey="prevista" stroke="#8B5CF6" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3 }} name="Prevista" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </ChartCard>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <GlassCard>
-                <div className="p-5">
-                  <h3 className="text-sm font-semibold mb-3">Clientes Impactando Previsão</h3>
-                  <p className="text-[10px] text-muted-foreground mb-3">Alto risco de churn afetando receita futura</p>
-                  <div className="space-y-2">
-                    {[
-                      { name: "Ana Paula Santos", plan: "50 Mega", risk: 85, impact: "R$ 718/ano" },
-                      { name: "Luciana Martins", plan: "50 Mega", risk: 78, impact: "R$ 718/ano" },
-                      { name: "Roberto Almeida", plan: "300 Mega", risk: 72, impact: "R$ 2.398/ano" },
-                    ].map((c, i) => (
-                      <div key={i} className="flex items-center justify-between p-2 rounded-lg hover:bg-accent/40 transition-colors">
-                        <div>
-                          <p className="text-xs font-medium">{c.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{c.plan} • Score {c.risk}</p>
-                        </div>
-                        <span className="text-xs font-medium text-destructive">-{c.impact}</span>
+              <ChartCard
+                title="Clientes Impactando Previsão"
+                subtitle="Alto risco de churn afetando receita futura"
+                minHeight="min-h-fit"
+              >
+                <div className="space-y-2">
+                  {[
+                    { name: "Ana Paula Santos", plan: "50 Mega", risk: 85, impact: "R$ 718/ano" },
+                    { name: "Luciana Martins", plan: "50 Mega", risk: 78, impact: "R$ 718/ano" },
+                    { name: "Roberto Almeida", plan: "300 Mega", risk: 72, impact: "R$ 2.398/ano" },
+                  ].map((c, i) => (
+                    <div key={i} className="flex items-center justify-between p-2 rounded-lg hover:bg-accent/40 transition-colors">
+                      <div>
+                        <p className="text-xs font-medium">{c.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{c.plan} • Score {c.risk}</p>
                       </div>
-                    ))}
-                  </div>
+                      <span className="text-xs font-medium text-destructive">-{c.impact}</span>
+                    </div>
+                  ))}
                 </div>
-              </GlassCard>
+              </ChartCard>
 
-              <GlassCard>
-                <div className="p-5">
-                  <h3 className="text-sm font-semibold mb-3">Efetividade das Automações</h3>
-                  <div className="space-y-3">
-                    {[
-                      { name: "Lembrete D-3", recovery: "R$ 84.752", rate: "48,3%" },
-                      { name: "Cobrança D+3", recovery: "R$ 21.812", rate: "40,1%" },
-                      { name: "Aviso suspensão D+15", recovery: "R$ 9.820", rate: "58,0%" },
-                    ].map((a, i) => (
-                      <div key={i} className="p-2.5 rounded-lg" style={{ background: "rgba(0,0,0,0.02)" }}>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-xs font-medium">{a.name}</span>
-                          <span className="text-xs font-semibold" style={{ color: "#10B981" }}>{a.recovery}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] text-muted-foreground">
-                          <span>Taxa de conversão</span>
-                          <span>{a.rate}</span>
-                        </div>
+              <ChartCard
+                title="Efetividade das Automações"
+                minHeight="min-h-fit"
+              >
+                <div className="space-y-3">
+                  {[
+                    { name: "Lembrete D-3", recovery: "R$ 84.752", rate: "48,3%" },
+                    { name: "Cobrança D+3", recovery: "R$ 21.812", rate: "40,1%" },
+                    { name: "Aviso suspensão D+15", recovery: "R$ 9.820", rate: "58,0%" },
+                  ].map((a, i) => (
+                    <div key={i} className="p-2.5 rounded-lg" style={{ background: "rgba(0,0,0,0.02)" }}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-xs font-medium">{a.name}</span>
+                        <span className="text-xs font-semibold" style={{ color: "#10B981" }}>{a.recovery}</span>
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>Taxa de conversão</span>
+                        <span>{a.rate}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </GlassCard>
+              </ChartCard>
             </div>
           </TabsContent>
 

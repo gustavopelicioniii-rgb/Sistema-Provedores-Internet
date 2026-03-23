@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { DollarSign, TrendingUp, TrendingDown, Network, Zap, FileText, Download, Calendar } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -43,23 +44,23 @@ export default function Reports() {
   return (
     <PageWrapper>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Relatórios</h2>
-            <p className="text-xs text-muted-foreground">Gere relatórios detalhados sobre seu provedor</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <Select defaultValue="month">
-              <SelectTrigger className="w-44" style={{ borderRadius: 10 }}><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {periods.map((p) => (
-                  <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <PageHeader
+          title="Relatórios"
+          subtitle="Gere relatórios detalhados sobre seu provedor"
+          actions={
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Select defaultValue="month">
+                <SelectTrigger className="w-44" style={{ borderRadius: 10 }}><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {periods.map((p) => (
+                    <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reports.map((report, i) => (

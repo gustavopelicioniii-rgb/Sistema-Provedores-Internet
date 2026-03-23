@@ -1,5 +1,6 @@
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,9 @@ export default function SettingsPage() {
   return (
     <PageWrapper>
       <div className="space-y-6">
+        {/* Page Header */}
+        <PageHeader title="Configurações" subtitle="Gerencie empresa, usuários, integrações e notificações" />
+
         <Tabs defaultValue="empresa">
           <TabsList className="glass-card p-1">
             <TabsTrigger value="empresa">Empresa</TabsTrigger>

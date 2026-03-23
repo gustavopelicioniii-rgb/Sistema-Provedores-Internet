@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { KPICard } from "@/components/shared/KPICard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,20 +46,21 @@ export default function Tickets() {
   return (
     <PageWrapper>
       <div className="space-y-6">
-        {/* Mini KPIs */}
+        {/* Page Header */}
+        <PageHeader title="Tickets de Suporte" subtitle="Gerencie chamados de clientes em tempo real" />
+
+        {/* KPI Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {ticketKpis.map((kpi, i) => (
-            <GlassCard key={kpi.label} hover className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="p-4 flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: kpi.bg }}>
-                  <kpi.icon style={{ width: 18, height: 18, color: kpi.color }} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-muted-foreground">{kpi.label}</p>
-                  <p className="text-xl font-bold">{kpi.value}</p>
-                </div>
-              </div>
-            </GlassCard>
+            <KPICard
+              key={kpi.label}
+              title={kpi.label}
+              value={kpi.value}
+              icon={kpi.icon}
+              iconColor={kpi.color}
+              iconBg={kpi.bg}
+              className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}
+            />
           ))}
         </div>
 

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { PageWrapper } from "@/components/shared/PageWrapper";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { KPICard } from "@/components/shared/KPICard";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -41,30 +43,29 @@ export default function Automations() {
   return (
     <PageWrapper>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Automações</h2>
-            <p className="text-xs text-muted-foreground">Automatize processos e reduza trabalho manual</p>
-          </div>
-          <Badge variant="outline" className="text-primary border-primary/20" style={{ background: 'rgba(59,130,246,0.05)', borderRadius: 9999 }}>
-            {automations.filter((a) => a.active).length} ativas
-          </Badge>
-        </div>
+        {/* Page Header */}
+        <PageHeader
+          title="Automações"
+          subtitle="Automatize processos e reduza trabalho manual"
+          actions={
+            <Badge variant="outline" className="text-primary border-primary/20" style={{ background: 'rgba(59,130,246,0.05)', borderRadius: 9999 }}>
+              {automations.filter((a) => a.active).length} ativas
+            </Badge>
+          }
+        />
 
         {/* Impact KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {impactKpis.map((kpi, i) => (
-            <GlassCard key={kpi.label} hover className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="p-5 flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: kpi.bg }}>
-                  <kpi.icon style={{ width: 20, height: 20, color: kpi.color }} />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">{kpi.label}</p>
-                  <p className="text-[28px] font-bold">{kpi.value}</p>
-                </div>
-              </div>
-            </GlassCard>
+            <KPICard
+              key={kpi.label}
+              title={kpi.label}
+              value={kpi.value}
+              icon={kpi.icon}
+              iconColor={kpi.color}
+              iconBg={kpi.bg}
+              className="stagger-item" style={{ animationDelay: `${i * 50}ms` }}
+            />
           ))}
         </div>
 
