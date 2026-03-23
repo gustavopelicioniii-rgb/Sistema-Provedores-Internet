@@ -1,13 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, DollarSign, Network, Zap, Headphones,
-  FileText, BarChart3, Settings, Wifi, ChevronLeft, Sparkles
+  FileText, BarChart3, Settings, Wifi, Sparkles
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { RecentNavigation } from "@/components/RecentNavigation";
 
 const navGroups = [
   {
@@ -70,9 +71,7 @@ export function AppSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild className={cn(
                         "transition-all duration-200 rounded-lg my-0.5",
-                        isActive
-                          ? "sidebar-item-active"
-                          : "hover:bg-accent/60"
+                        isActive ? "sidebar-item-active" : "hover:bg-accent/60"
                       )}>
                         <Link to={item.url} className="flex items-center gap-3">
                           <item.icon
@@ -93,6 +92,8 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
+
+        <RecentNavigation collapsed={collapsed} />
       </SidebarContent>
 
       <SidebarFooter className="p-3" style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
