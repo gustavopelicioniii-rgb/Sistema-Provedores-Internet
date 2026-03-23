@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { GlassCard } from "@/components/GlassCard";
+import { GlassCard } from "@/components/shared/GlassCard";
 
 interface OLT {
   id: string;

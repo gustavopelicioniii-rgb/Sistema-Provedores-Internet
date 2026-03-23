@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
   Bot, Sparkles, MessageSquare, TrendingUp, Users, Clock, ThumbsUp,
   Brain, AlertTriangle, ArrowUpRight, ArrowRight, Send, Settings2,

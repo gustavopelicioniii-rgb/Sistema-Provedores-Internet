@@ -1,7 +1,7 @@
-import { GlassCard } from "@/components/GlassCard";
+import { GlassCard } from "@/components/shared/GlassCard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { AlertTriangle, Ticket, Bell } from "lucide-react";
 
 interface AtRiskClient {

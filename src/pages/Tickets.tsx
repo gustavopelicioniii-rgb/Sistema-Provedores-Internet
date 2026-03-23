@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Plus, Search, LayoutList, Kanban, Clock, CheckCircle, AlertCircle, Timer } from "lucide-react";
 import { mockTickets } from "@/data/mockData";
 

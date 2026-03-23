@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { PlansTable } from "@/components/plans/PlansTable";
-import { PlanKPIs } from "@/components/plans/PlanKPIs";
-import { PlansComparison } from "@/components/plans/PlansComparison";
+import { PlansTable } from "@/components/features/plans/PlansTable";
+import { PlanKPIs } from "@/components/features/plans/PlanKPIs";
+import { PlansComparison } from "@/components/features/plans/PlansComparison";
 import { usePlans, usePlanKPIs, useCreatePlan, useUpdatePlan, useDeletePlan } from "@/hooks/usePlans";
 import { useUIStore } from "@/store/uiStore";
 import { useAuthStore } from "@/store/authStore";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import {
   Plus, LayoutList, LayoutGrid, Download, Upload, BarChart3, Search, RefreshCw
 } from "lucide-react";

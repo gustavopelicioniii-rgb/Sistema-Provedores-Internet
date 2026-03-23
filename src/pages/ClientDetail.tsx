@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Phone, Mail, MapPin, Edit, PauseCircle, FileText,

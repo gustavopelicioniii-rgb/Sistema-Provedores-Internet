@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GlassCard } from "@/components/GlassCard";
-import { GlassBackground } from "@/components/GlassBackground";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { GlassBackground } from "@/components/shared/GlassBackground";
 import { Wifi } from "lucide-react";
 
 export default function ForgotPassword() {

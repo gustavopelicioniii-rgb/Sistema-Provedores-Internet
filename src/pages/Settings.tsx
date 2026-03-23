@@ -1,5 +1,5 @@
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { DollarSign, TrendingUp, TrendingDown, Network, Zap, FileText, Download, Calendar } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

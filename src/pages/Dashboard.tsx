@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { GlassCard } from "@/components/GlassCard";
-import { PageWrapper } from "@/components/PageWrapper";
-import { StatusBadge } from "@/components/StatusBadge";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { PageWrapper } from "@/components/shared/PageWrapper";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
   Users, DollarSign, Headphones, TrendingDown, Zap, ArrowUpRight, ArrowDownRight,
   RefreshCw, Maximize2, AlertTriangle, Wifi, WifiOff, Sparkles, ChevronRight,

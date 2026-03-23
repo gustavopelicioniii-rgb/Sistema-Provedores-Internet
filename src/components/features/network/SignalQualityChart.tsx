@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/GlassCard";
+import { GlassCard } from "@/components/shared/GlassCard";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from "recharts";
 
 interface SignalData {

@@ -1,11 +1,11 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GlassBackground } from "@/components/GlassBackground";
-import { GlobalSearch } from "@/components/GlobalSearch";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { GlassBackground } from "@/components/shared/GlassBackground";
+import { GlobalSearch } from "@/components/shared/GlobalSearch";
+import { Breadcrumb } from "@/components/shared/Breadcrumb";
 
 const routeTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -29,7 +29,7 @@ export default function AppLayout() {
     <SidebarProvider>
       <GlassBackground />
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 glass-topbar flex items-center justify-between px-4 flex-shrink-0 sticky top-0 z-30">
             <div className="flex items-center gap-3">

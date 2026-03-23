@@ -8,7 +8,7 @@ import {
   SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { RecentNavigation } from "@/components/RecentNavigation";
+import { RecentNavigation } from "@/components/shared/RecentNavigation";
 
 const navGroups = [
   {
@@ -43,7 +43,7 @@ const navGroups = [
   },
 ];
 
-export function AppSidebar() {
+export function Sidebar() {
   const location = useLocation();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";

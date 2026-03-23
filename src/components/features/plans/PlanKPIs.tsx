@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/GlassCard";
+import { GlassCard } from "@/components/shared/GlassCard";
 import { TrendingUp, TrendingDown, Users, DollarSign, AlertTriangle, ArrowUpRight, ArrowDownRight, Percent } from "lucide-react";
 
 interface PlanKPIsProps {

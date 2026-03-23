@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/GlassCard";
+import { GlassCard } from "@/components/shared/GlassCard";
 
 interface RegionData {
   region: string;

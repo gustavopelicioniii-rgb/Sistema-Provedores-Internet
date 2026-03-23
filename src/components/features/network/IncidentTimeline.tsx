@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/GlassCard";
+import { GlassCard } from "@/components/shared/GlassCard";
 import { AlertTriangle, CheckCircle, Clock, WifiOff, Wrench, Scissors } from "lucide-react";
 
 interface Incident {
