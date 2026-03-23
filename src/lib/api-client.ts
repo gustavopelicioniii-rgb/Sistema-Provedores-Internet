@@ -1,16 +1,6 @@
-const API_BASE = '/api';
+import { ApiResponse } from '@/types';
 
-interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  code?: string;
-  total?: number;
-  page?: number;
-  limit?: number;
-  totalPages?: number;
-  details?: any[];
-}
+const API_BASE = '/api';
 
 class ApiClient {
   private token: string | null = null;
@@ -34,8 +24,8 @@ class ApiClient {
   private async request<T>(
     method: string,
     path: string,
-    body?: any,
-    params?: Record<string, any>
+    body?: Record<string, unknown>,
+    params?: Record<string, unknown>
   ): Promise<ApiResponse<T>> {
     const url = new URL(`${window.location.origin}${API_BASE}${path}`);
 
