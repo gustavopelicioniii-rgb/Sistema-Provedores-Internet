@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Wifi, AlertTriangle, Server, Activity, Map, Table2, Clock, Thermometer, Users, RefreshCw } from "lucide-react";
+import { formatSpeed } from "@/lib/formatters";
 import { OLTMap } from "@/components/features/network/OLTMap";
 import { OLTsTable } from "@/components/features/network/OLTsTable";
 import { IncidentTimeline } from "@/components/features/network/IncidentTimeline";

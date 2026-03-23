@@ -20,6 +20,7 @@ import {
   Plus, LayoutList, LayoutGrid, Download, Upload, BarChart3, Search, RefreshCw
 } from "lucide-react";
 import { mockPlans } from "@/data/mockData";
+import { formatCurrency, formatSpeed } from "@/lib/formatters";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Plans() {

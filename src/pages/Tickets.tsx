@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Plus, Search, LayoutList, Kanban, Clock, CheckCircle, AlertCircle, Timer } from "lucide-react";
+import { formatDate } from "@/lib/formatters";
 import { mockTickets } from "@/data/mockData";
 
 const ticketKpis = [

@@ -15,6 +15,7 @@ import {
   Wifi, CreditCard, UserPlus, Heart, Star, Settings2, Gauge,
   ShieldCheck, TrendingUp, DollarSign
 } from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 import { mockAutomations } from "@/data/mockData";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 

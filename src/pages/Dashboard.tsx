@@ -15,6 +15,8 @@ import {
   mockChartClients, mockChartRevenue, mockTickets, mockPlanDistribution,
   mockChurnActivations, mockHeatmapData, mockAutomations
 } from "@/data/mockData";
+import { formatCurrency, formatDate } from "@/lib/formatters";
+import { CHART_COLORS } from "@/lib/constants";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Line
@@ -25,13 +27,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const kpis = [
   { label: "Clientes ativos", value: "4.872", icon: Users, change: "+3,2%", positive: true, bg: "rgba(59,130,246,0.1)", iconColor: "#2563EB", link: "/clients", trend: [40, 42, 44, 43, 45, 46, 47, 48, 47, 49, 48, 49] },
-  { label: "MRR", value: "R$ 243.600", icon: DollarSign, change: "+5,1%", positive: true, bg: "rgba(16,185,129,0.1)", iconColor: "#10B981", link: "/finance", trend: [200, 210, 215, 222, 228, 232, 238, 240, 241, 243, 242, 244] },
+  { label: "MRR", value: formatCurrency(243600), icon: DollarSign, change: "+5,1%", positive: true, bg: "rgba(16,185,129,0.1)", iconColor: "#10B981", link: "/finance", trend: [200, 210, 215, 222, 228, 232, 238, 240, 241, 243, 242, 244] },
   { label: "Tickets abertos", value: "37", icon: Headphones, change: "-12%", positive: true, bg: "rgba(245,158,11,0.1)", iconColor: "#F59E0B", link: "/tickets", trend: [45, 42, 40, 38, 41, 39, 37, 35, 38, 36, 37, 37] },
   { label: "Churn mensal", value: "1,8%", icon: TrendingDown, change: "-0,3pp", positive: true, bg: "rgba(239,68,68,0.1)", iconColor: "#EF4444", link: "/reports", trend: [2.5, 2.3, 2.1, 2.0, 1.9, 2.1, 1.8, 1.9, 1.7, 1.8, 1.9, 1.8] },
   { label: "Automações hoje", value: "124", icon: Zap, change: "+18%", positive: true, bg: "rgba(139,92,246,0.1)", iconColor: "#8B5CF6", link: "/automations", trend: [80, 85, 90, 95, 100, 105, 110, 108, 112, 118, 120, 124] },
   { label: "Inadimplência", value: "6,5%", icon: CircleDollarSign, change: "-0,8pp", positive: true, bg: "rgba(245,158,11,0.1)", iconColor: "#D97706", link: "/finance", trend: [8.5, 8.0, 7.8, 7.5, 7.2, 7.0, 6.8, 6.9, 6.7, 6.5, 6.6, 6.5] },
   { label: "Uptime", value: "99,7%", icon: Activity, change: "+0,1pp", positive: true, bg: "rgba(16,185,129,0.1)", iconColor: "#059669", link: "/network", trend: [99.2, 99.5, 99.3, 99.6, 99.4, 99.7, 99.5, 99.8, 99.6, 99.7, 99.8, 99.7] },
-  { label: "Receita prevista", value: "R$ 258.400", icon: Target, change: "+6,1%", positive: true, bg: "rgba(59,130,246,0.1)", iconColor: "#2563EB", link: "/finance", trend: [220, 225, 230, 235, 240, 242, 245, 248, 250, 253, 255, 258] },
+  { label: "Receita prevista", value: formatCurrency(258400), icon: Target, change: "+6,1%", positive: true, bg: "rgba(59,130,246,0.1)", iconColor: "#2563EB", link: "/finance", trend: [220, 225, 230, 235, 240, 242, 245, 248, 250, 253, 255, 258] },
 ];
 
 const urgentActions = [
@@ -67,10 +69,10 @@ const clientsAtRisk = [
 ];
 
 const criticalBilling = [
-  { client: "Ana Paula Santos", amount: 59.90, days: 38, status: "Suspensão em 2 dias" },
-  { client: "Luciana Martins", amount: 119.80, days: 72, status: "Suspensa" },
-  { client: "Roberto Almeida", amount: 199.90, days: 5, status: "Enviar 2ª cobrança" },
-  { client: "Fernanda Lima", amount: 99.90, days: 90, status: "Cancelada" },
+  { client: "Ana Paula Santos", amount: 59.90, days: 38, status: "Suspensão em 2 dias", formattedAmount: formatCurrency(59.90) },
+  { client: "Luciana Martins", amount: 119.80, days: 72, status: "Suspensa", formattedAmount: formatCurrency(119.80) },
+  { client: "Roberto Almeida", amount: 199.90, days: 5, status: "Enviar 2ª cobrança", formattedAmount: formatCurrency(199.90) },
+  { client: "Fernanda Lima", amount: 99.90, days: 90, status: "Cancelada", formattedAmount: formatCurrency(99.90) },
 ];
 
 const revenueForcast = [
@@ -326,7 +328,7 @@ export default function Dashboard() {
                       <p className="text-[10px] text-muted-foreground">{b.days} dias em atraso</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold">R$ {b.amount.toFixed(2)}</span>
+                      <span className="text-xs font-semibold">{b.formattedAmount}</span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.1)", color: "#DC2626" }}>{b.status}</span>
                     </div>
                   </div>

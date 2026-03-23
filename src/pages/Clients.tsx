@@ -18,6 +18,7 @@ import {
   Send, MoreHorizontal, AlertTriangle
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { formatDocument } from "@/lib/formatters";
 import { mockClients } from "@/data/mockData";
 
 // Add risk scores to clients

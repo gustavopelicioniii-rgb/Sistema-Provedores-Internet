@@ -15,6 +15,8 @@ import {
   MoreHorizontal, MessageSquare, Mail, CreditCard, XCircle, RefreshCw, BarChart3
 } from "lucide-react";
 import { mockInvoices, mockBills, mockNFs, mockCashflow } from "@/data/mockData";
+import { formatCurrency } from "@/lib/formatters";
+import { CHART_COLORS } from "@/lib/constants";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, BarChart, Bar } from "recharts";
 
 const summary = [
@@ -133,7 +135,7 @@ export default function Finance() {
                       <TableRow key={inv.id} className="glass-table-row border-none">
                         <TableCell className="font-medium text-xs">{inv.id}</TableCell>
                         <TableCell className="text-xs">{inv.client}</TableCell>
-                        <TableCell className="text-xs">R$ {inv.amount.toFixed(2)}</TableCell>
+                        <TableCell className="text-xs">{formatCurrency(inv.amount)}</TableCell>
                         <TableCell className="text-xs">{inv.dueDate}</TableCell>
                         <TableCell><StatusBadge status={inv.status} /></TableCell>
                         <TableCell>
@@ -177,7 +179,7 @@ export default function Finance() {
                     {mockBills.map((b) => (
                       <TableRow key={b.id} className="glass-table-row border-none">
                         <TableCell className="font-medium text-xs">{b.supplier}</TableCell>
-                        <TableCell className="text-xs">R$ {b.amount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</TableCell>
+                        <TableCell className="text-xs">{formatCurrency(b.amount)}</TableCell>
                         <TableCell className="text-xs">{b.dueDate}</TableCell>
                         <TableCell className="text-xs">{b.category}</TableCell>
                         <TableCell><StatusBadge status={b.status} /></TableCell>
@@ -377,7 +379,7 @@ export default function Finance() {
                         <TableCell className="font-medium text-xs">{nf.id}</TableCell>
                         <TableCell className="text-xs">{nf.serie}</TableCell>
                         <TableCell className="text-xs">{nf.client}</TableCell>
-                        <TableCell className="text-xs">R$ {nf.amount.toFixed(2)}</TableCell>
+                        <TableCell className="text-xs">{formatCurrency(nf.amount)}</TableCell>
                         <TableCell className="text-xs">{nf.issueDate}</TableCell>
                         <TableCell><StatusBadge status={nf.status} /></TableCell>
                         <TableCell>
