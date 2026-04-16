@@ -24,7 +24,7 @@ CREATE TABLE public.automations (
   action_config JSONB NOT NULL DEFAULT '{}'::jsonb,
   enabled BOOLEAN NOT NULL DEFAULT true,
   webhook_url TEXT,
-  webhook_secret TEXT DEFAULT encode(gen_random_bytes(32), 'hex'),
+  webhook_secret TEXT DEFAULT md5(random()::text || clock_timestamp()::text || current_database()),
   last_triggered_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
