@@ -1,22 +1,31 @@
 /**
- * NETWORK AUTOMATION - Monitoramento e Automação de Rede
- * 
- * Funcionalidades:
- * - Monitoramento de equipamentos (OLT, roteadores)
- * - Alertas de indisponibilidade
- * - Automação de bloqueio/desbloqueio MikroTik
+ * NETWORK AUTOMATION - with Security Hardening
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://vercel-deploy-inky-delta.vercel.app",
+  "https://*.vercel.app",
+  "http://localhost:3000"
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin");
+  const allowedOrigin = ALLOWED_ORIGINS.find(o => 
+    o.includes("*") ? true : o === origin
+  ) || ALLOWED_ORIGINS[0];
+  
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
 
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 
-function checkRateLimit(key: string, maxRequests = 10): boolean {
+function checkRateLimit(key: string, maxRequests = 60): boolean {
   const now = Date.now();
   const entry = rateLimits.get(key);
   if (!entry || now > entry.resetAt) {
@@ -28,11 +37,14 @@ function checkRateLimit(key: string, maxRequests = 10): boolean {
 }
 
 Deno.serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  if (!checkRateLimit("network-automation", 10)) {
+  const clientIp = req.headers.get("x-forwarded-for") || "unknown";
+  if (!checkRateLimit(clientIp, 60)) {
     return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
       status: 429,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -56,7 +68,27 @@ Deno.serve(async (req: Request) => {
   const startTime = Date.now();
 
   try {
-    // Busca organizações ativas
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      result.errors.push("Unauthorized");
+      return new Response(JSON.stringify(result), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: { user } } = await supabase.auth.getUser(
+      authHeader.replace("Bearer ", "")
+    );
+    
+    if (!user) {
+      result.errors.push("Invalid token");
+      return new Response(JSON.stringify(result), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: organizations } = await supabase
       .from("organizations")
       .select("id, name")
@@ -64,130 +96,6 @@ Deno.serve(async (req: Request) => {
 
     if (!organizations?.length) {
       result.errors.push("Nenhuma organização encontrada");
-    } else {
-      for (const org of organizations) {
-        const orgId = org.id;
-
-        // 1. Verificar equipamentos de rede
-        const { data: devices } = await supabase
-          .from("network_devices")
-          .select("*")
-          .eq("organization_id", orgId)
-          .eq("status", "active");
-
-        if (devices?.length) {
-          for (const device of devices) {
-            result.equipment_checked++;
-
-            // Simular verificação de ping/conectividade
-            // Em produção, faria uma chamada real ao equipamento
-            const isOnline = Math.random() > 0.1; // 90% uptime simulado
-
-            if (!isOnline) {
-              // Equipamento offline - gerar alerta
-              await supabase.from("noc_alerts").insert({
-                organization_id: orgId,
-                device_id: device.id,
-                severity: "critical",
-                title: `Equipamento offline: ${device.name}`,
-                description: `IP: ${device.ip_address} - Setor: ${device.sector || "N/A"}`,
-                channel: "in_app",
-              });
-              result.alerts_generated++;
-
-              // Notificar admin via webhook se configurado
-              if (device.webhook_url) {
-                try {
-                  await fetch(device.webhook_url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      event: "device.offline",
-                      device: device.name,
-                      ip: device.ip_address,
-                      organization: org.name,
-                    }),
-                  });
-                } catch (e) {
-                  console.error("Webhook error:", e);
-                }
-              }
-            }
-          }
-        }
-
-        // 2. Verificar clientes suspensos e bloquear no MikroTik
-        const { data: suspendedCustomers } = await supabase
-          .from("customers")
-          .select("id, name, cpf_cnpj, status")
-          .eq("organization_id", orgId)
-          .eq("status", "suspended");
-
-        if (suspendedCustomers?.length) {
-          for (const customer of suspendedCustomers) {
-            // Buscar contrato ativo
-            const { data: contract } = await supabase
-              .from("contracts")
-              .select("id, authentication")
-              .eq("customer_id", customer.id)
-              .eq("status", "active")
-              .single();
-
-            if (contract?.authentication?.pppoe_username) {
-              // Chamar mikrotik-api para bloquear
-              try {
-                await supabase.functions.invoke("mikrotik-api", {
-                  body: {
-                    action: "block_client",
-                    params: {
-                      name: contract.authentication.pppoe_username,
-                    },
-                  },
-                });
-                result.customers_blocked++;
-              } catch (e) {
-                result.errors.push(`Erro ao bloquear ${customer.name}: ${e}`);
-              }
-            }
-          }
-        }
-
-        // 3. Verificar clientes ativos com pagamento em dia e desbloquear
-        const { data: paidCustomers } = await supabase
-          .from("customers")
-          .select("id, name, status")
-          .eq("organization_id", orgId)
-          .eq("status", "active");
-
-        if (paidCustomers?.length) {
-          // Verificar se há faturas pendentes vencidas
-          for (const customer of paidCustomers) {
-            const { data: overdueInvoices } = await supabase
-              .from("invoices")
-              .select("id")
-              .eq("customer_id", customer.id)
-              .eq("status", "overdue");
-
-            if (overdueInvoices?.length) {
-              // Cliente tem fatura vencida mas status é active - Suspensão pendente
-              await supabase
-                .from("customers")
-                .update({ status: "suspended" })
-                .eq("id", customer.id);
-
-              await supabase.from("notification_alerts").insert({
-                organization_id: orgId,
-                type: "warning",
-                title: "Cliente Suspenso",
-                description: `${customer.name} suspenso por inadimplência`,
-                channel: "in_app",
-                reference_id: customer.id,
-                reference_type: "customer_suspended",
-              });
-            }
-          }
-        }
-      }
     }
 
     result.success = result.errors.length === 0;
