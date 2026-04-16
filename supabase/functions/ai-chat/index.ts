@@ -1,80 +1,228 @@
+/**
+ * AI CHAT - MiniMax Integration
+ * 
+ * Provides AI-powered chat for ISP management system
+ * Uses MiniMax API for natural language processing
+ */
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const MINIMAX_API_KEY = Deno.env.get("MINIMAX_API_KEY");
+const MINIMAX_BASE_URL = "https://api.minimax.chat";
+
+const SYSTEM_PROMPT = `Você é o assistente IA integrado de um sistema de gestão para provedores de internet (ISP) brasileiro chamado NetPulse.
+Você pode ajudar com:
+- Dúvidas sobre o sistema (clientes, contratos, faturas, tickets, ordens de serviço, rede, estoque, frota, automações)
+- Análise de dados e métricas do provedor
+- Sugestões de automações e fluxos de trabalho
+- Boas práticas de gestão de ISP
+- Troubleshooting de rede e equipamentos MikroTik, OLT, etc
+- Dúvidas sobre cobrança, fiscal (NFSe, CND) e financeiro
+- Configuração de planos, pacotes e promoções
+- Monitoramento NOC e alertas de rede
+
+Instruções:
+- Responda sempre em português brasileiro
+- Use markdown para formatar suas respostas
+- Seja proativo em sugerir soluções
+- Para dados do sistema, use ferramentas disponíveis quando solicitado
+- Máximo 500 tokens por resposta
+
+Dados do sistema:
+- ERP completo para ISPs
+- Gestão de clientes e contratos  
+- Faturas e cobranças (ASAAS, Pagar.me)
+- NOC integrado para monitoramento
+- Automação de suspensão/reativação
+- Portal do assinante
+- App técnico em campo`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+  if (!MINIMAX_API_KEY) {
+    return new Response(
+      JSON.stringify({ error: "MINIMAX_API_KEY não configurada" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
 
-    const { messages } = await req.json();
+  try {
+    const { messages, stream = true } = await req.json();
+    
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
-        JSON.stringify({ error: "Messages array is required" }),
+        JSON.stringify({ error: "Messages array é obrigatória" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const systemPrompt = `Você é o assistente IA integrado de um sistema de gestão para provedores de internet (ISP).
-Você pode ajudar com:
-- Dúvidas sobre o sistema (clientes, contratos, faturas, tickets, ordens de serviço, rede, estoque, frota, automações)
-- Análise de dados e métricas do provedor
-- Sugestões de automações e fluxos de trabalho
-- Boas práticas de gestão de ISP
-- Troubleshooting de rede e equipamentos
-- Dúvidas sobre cobrança, fiscal e financeiro
+    // Format messages for MiniMax
+    const formattedMessages = [
+      { role: "system", name: "system", content: SYSTEM_PROMPT },
+      ...messages.map((m: any) => ({
+        role: m.role === "user" ? "user" : "assistant",
+        name: m.name || "user",
+        content: m.content
+      }))
+    ];
 
-Responda sempre em português brasileiro, de forma clara e objetiva. Use markdown para formatar suas respostas quando apropriado.
-Seja proativo em sugerir soluções e melhorias.`;
+    if (stream) {
+      // Streaming response
+      const response = await fetch(`${MINIMAX_BASE_URL}/v1/text/chatcompletion_v2`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${MINIMAX_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "MiniMax-Text-01",
+          messages: formattedMessages,
+          stream: true,
+          max_tokens: 500,
+          temperature: 0.7,
+        }),
+      });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-        stream: true,
-      }),
-    });
-
-    if (!response.ok) {
-      if (response.status === 429) {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("MiniMax API error:", response.status, errorText);
         return new Response(
-          JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns segundos." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: `Erro da API MiniMax: ${response.status}` }),
+          { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+
+      // Transform MiniMax stream to OpenAI-compatible format
+      const stream = new ReadableStream({
+        async start(controller) {
+          const reader = response.body?.getReader();
+          const decoder = new TextDecoder();
+          const encoder = new TextEncoder();
+
+          if (!reader) {
+            controller.close();
+            return;
+          }
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const chunk = decoder.decode(value);
+              const lines = chunk.split("\n");
+
+              for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                  const data = line.slice(6);
+                  if (data === "[DONE]") {
+                    controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                    break;
+                  }
+
+                  try {
+                    const parsed = JSON.parse(data);
+                    // MiniMax stream format to OpenAI format
+                    if (parsed.choices?.[0]?.delta?.content) {
+                      const content = parsed.choices[0].delta.content;
+                      const openAIFormat = {
+                        choices: [{
+                          delta: { content },
+                          index: 0,
+                          finish_reason: null
+                        }],
+                        id: parsed.id || "chatcmpl-minimax",
+                        object: "chat.completion.chunk",
+                        created: Math.floor(Date.now() / 1000),
+                      };
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify(openAIFormat)}\n\n`));
+                    }
+                  } catch (e) {
+                    // Skip malformed JSON
+                  }
+                }
+              }
+            }
+          } finally {
+            reader.releaseLock();
+            controller.close();
+          }
+        }
+      });
+
+      return new Response(stream, {
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        },
+      });
+
+    } else {
+      // Non-streaming response
+      const response = await fetch(`${MINIMAX_BASE_URL}/v1/text/chatcompletion_v2`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${MINIMAX_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "MiniMax-Text-01",
+          messages: formattedMessages,
+          stream: false,
+          max_tokens: 500,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("MiniMax API error:", response.status, errorText);
         return new Response(
-          JSON.stringify({ error: "Créditos de IA esgotados. Adicione créditos em Configurações." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: `Erro da API MiniMax: ${response.status}` }),
+          { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(
-        JSON.stringify({ error: "Erro no serviço de IA" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+
+      const data = await response.json();
+      
+      // Transform MiniMax response to OpenAI-compatible format
+      // MiniMax uses 'messages' array in choices, not 'message' object
+      const assistantMessage = data.choices?.[0]?.messages?.[0]?.content || 
+                              data.choices?.[0]?.text || "";
+      
+      const openAIResponse = {
+        id: data.id || "chatcmpl-minimax",
+        object: "chat.completion",
+        created: Math.floor(Date.now() / 1000),
+        model: "MiniMax-Text-01",
+        choices: [{
+          index: 0,
+          message: {
+            role: "assistant",
+            content: assistantMessage,
+          },
+          finish_reason: "stop",
+        }],
+        usage: {
+          prompt_tokens: data.usage?.prompt_tokens || 0,
+          completion_tokens: data.usage?.completion_tokens || 0,
+          total_tokens: (data.usage?.prompt_tokens || 0) + (data.usage?.completion_tokens || 0),
+        },
+      };
+
+      return new Response(JSON.stringify(openAIResponse), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
   } catch (e) {
     console.error("AI chat error:", e);
     return new Response(
