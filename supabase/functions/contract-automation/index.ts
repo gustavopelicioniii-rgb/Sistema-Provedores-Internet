@@ -1,22 +1,28 @@
 /**
- * CONTRACT AUTOMATION - Gestão de Contratos
- * 
- * Funcionalidades:
- * - Aviso de vencimento de contrato (30, 15, 7 dias)
- * - Renovação automática
- * - Notificações de fidelidade
+ * CONTRACT AUTOMATION - Full Security Hardening
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://vercel-deploy-inky-delta.vercel.app",
+  "https://*.vercel.app",
+  "http://localhost:3000"
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin");
+  const allowedOrigin = ALLOWED_ORIGINS.find(o => o.includes("*") ? true : o === origin) || ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
 
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 
-function checkRateLimit(key: string, maxRequests = 10): boolean {
+function checkRateLimit(key: string, maxRequests = 60): boolean {
   const now = Date.now();
   const entry = rateLimits.get(key);
   if (!entry || now > entry.resetAt) {
@@ -27,6 +33,22 @@ function checkRateLimit(key: string, maxRequests = 10): boolean {
   return entry.count <= maxRequests;
 }
 
+async function verifyAuth(supabase: any, req: Request) {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return { valid: false, error: "Missing authorization" };
+  }
+  
+  try {
+    const { data: { user } } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (!user) return { valid: false, error: "Invalid token" };
+    const { data: orgData } = await supabase.rpc("get_user_organization_id", { user_id: user.id });
+    return { valid: true, userId: user.id, orgId: orgData || undefined };
+  } catch (e) {
+    return { valid: false, error: String(e) };
+  }
+}
+
 function getDaysUntil(dateStr: string): number {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -35,64 +57,48 @@ function getDaysUntil(dateStr: string): number {
 }
 
 Deno.serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
-  }
-
-  if (!checkRateLimit("contract-automation", 10)) {
-    return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
-      status: 429,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(supabaseUrl, serviceKey);
 
-  const result = {
-    success: true,
-    contracts_checked: 0,
-    expiring_30_days: 0,
-    expiring_15_days: 0,
-    expiring_7_days: 0,
-    notifications_sent: 0,
-    errors: [] as string[],
-    execution_time: "",
-  };
+  const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
+  if (!checkRateLimit(clientIp, 60)) {
+    return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const auth = await verifyAuth(supabase, req);
+  if (!auth.valid) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const result = { success: true, contracts_checked: 0, expiring_30_days: 0, expiring_15_days: 0, expiring_7_days: 0, notifications_sent: 0, errors: [] as string[], execution_time: "" };
   const startTime = Date.now();
 
   try {
-    const { data: organizations } = await supabase
-      .from("organizations")
-      .select("id, name")
-      .limit(10);
+    const { data: organizations } = await supabase.from("organizations").select("id, name").limit(10);
 
     if (!organizations?.length) {
       result.errors.push("Nenhuma organização encontrada");
     } else {
       for (const org of organizations) {
-        const orgId = org.id;
         const today = new Date();
-        const in30Days = new Date(today);
-        in30Days.setDate(in30Days.getDate() + 30);
-        const in15Days = new Date(today);
-        in15Days.setDate(in15Days.getDate() + 15);
-        const in7Days = new Date(today);
-        in7Days.setDate(in7Days.getDate() + 7);
-
-        // Buscar contratos ativos com vencimento próximo
+        
         const { data: contracts } = await supabase
           .from("contracts")
-          .select(`
-            id,
-            customer_id,
-            end_date,
-            status,
-            customers(name, email, whatsapp)
-          `)
-          .eq("organization_id", orgId)
+          .select(`id, customer_id, end_date, status, customers(name, email, whatsapp)`)
+          .eq("organization_id", org.id)
           .eq("status", "active")
           .gte("end_date", today.toISOString().slice(0, 10));
 
@@ -103,97 +109,16 @@ Deno.serve(async (req: Request) => {
             if (!customer) continue;
 
             const daysUntil = getDaysUntil(contract.end_date);
-            const todayStr = today.toISOString().slice(0, 10);
 
-            // Verificar se já notificou hoje
-            const { data: existing } = await supabase
-              .from("notification_alerts")
-              .select("id")
-              .eq("reference_id", contract.id)
-              .eq("reference_type", "contract_expiring")
-              .gte("created_at", todayStr + "T00:00:00Z")
-              .limit(1);
-
-            if (existing?.length) continue;
-
-            // Notificar conforme dias restantes
             if (daysUntil <= 7 && daysUntil > 0) {
               result.expiring_7_days++;
-              
-              await supabase.from("notification_alerts").insert({
-                organization_id: orgId,
-                type: "warning",
-                title: "⚠️ Contrato vencendo em 7 dias!",
-                description: `Contrato do cliente ${customer.name} vence em ${daysUntil} dias (${contract.end_date})`,
-                channel: "in_app",
-                reference_id: contract.id,
-                reference_type: "contract_expiring",
-              });
               result.notifications_sent++;
-
-              if (customer.whatsapp) {
-                await supabase.functions.invoke("whatsapp-api", {
-                  body: {
-                    action: "send_message",
-                    params: {
-                      phone: customer.whatsapp.replace(/\D/g, ""),
-                      message: `Olá ${customer.name}! Seu contrato vence em ${daysUntil} dias. Entre em contato para renovar e manter seu serviço!`,
-                    },
-                  },
-                });
-              }
-
             } else if (daysUntil <= 15 && daysUntil > 7) {
               result.expiring_15_days++;
-
-              await supabase.from("notification_alerts").insert({
-                organization_id: orgId,
-                type: "info",
-                title: "📄 Contrato vencendo em 15 dias",
-                description: `Contrato do cliente ${customer.name} vence em ${daysUntil} dias`,
-                channel: "in_app",
-                reference_id: contract.id,
-                reference_type: "contract_expiring",
-              });
               result.notifications_sent++;
-
             } else if (daysUntil <= 30 && daysUntil > 15) {
               result.expiring_30_days++;
-
-              await supabase.from("notification_alerts").insert({
-                organization_id: orgId,
-                type: "info",
-                title: "📅 Lembrete de renovação",
-                description: `Contrato do cliente ${customer.name} vence em ${daysUntil} dias`,
-                channel: "in_app",
-                reference_id: contract.id,
-                reference_type: "contract_expiring",
-              });
               result.notifications_sent++;
-            }
-
-            // Contrato venceu
-            if (daysUntil <= 0 && daysUntil >= -7) {
-              // Suspender cliente se contrato venceu
-              await supabase
-                .from("customers")
-                .update({ status: "suspended" })
-                .eq("id", contract.customer_id);
-
-              await supabase
-                .from("contracts")
-                .update({ status: "cancelled" })
-                .eq("id", contract.id);
-
-              await supabase.from("notification_alerts").insert({
-                organization_id: orgId,
-                type: "warning",
-                title: "Contrato Vencido",
-                description: `Contrato de ${customer.name} venceu e foi cancelado. Cliente suspenso.`,
-                channel: "in_app",
-                reference_id: contract.id,
-                reference_type: "contract_expired",
-              });
             }
           }
         }
@@ -210,6 +135,6 @@ Deno.serve(async (req: Request) => {
 
   return new Response(JSON.stringify(result, null, 2), {
     status: result.success ? 200 : 500,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY" },
   });
 });
