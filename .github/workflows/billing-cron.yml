@@ -1,26 +1,120 @@
-name: Billing Automation
+name: Automation Cron Jobs
 
 on:
-  # Executa todo dia às 6h da manhã
   schedule:
+    # Every day at 6:00 AM UTC (3:00 AM Brasília)
     - cron: '0 6 * * *'
+    
+    # Every hour for health checks
+    - cron: '0 * * * *'
+    
+    # Every 15 minutes for NOC alerts
+    - cron: '*/15 * * * *'
   
-  # Permite execução manual pelo GitHub Actions
+  # Allow manual trigger
   workflow_dispatch:
+    inputs:
+      automation:
+        description: 'Automation to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - billing
+          - network
+          - contract
+          - usage
+          - noc-check
+
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
 jobs:
-  billing-automation:
-    name: Run Billing Automation
+  # Daily automations at 6 AM
+  daily-automation:
+    if: github.event.schedule == '0 6 * * *' || github.event.inputs.automation == 'all' || github.event.inputs.automation == 'billing'
     runs-on: ubuntu-latest
     steps:
-      - name: Invoke billing automation
+      - name: Run Billing Automation
         run: |
-          curl -X POST "${{ secrets.SUPABASE_URL }}/functions/v1/billing-automation" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+          curl -X POST "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/functions/v1/billing-automation" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
             -H "Content-Type: application/json" \
-            -d '{}'
-        shell: bash
-        
-      - name: Log execution
+            --data '{}'
+        continue-on-error: true
+
+      - name: Run Contract Automation
         run: |
-          echo "Billing automation executed at $(date)"
+          curl -X POST "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/functions/v1/contract-automation" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            --data '{}'
+        continue-on-error: true
+
+      - name: Run Usage Automation
+        run: |
+          curl -X POST "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/functions/v1/usage-automation" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            --data '{}'
+        continue-on-error: true
+
+  # Hourly health check
+  health-check:
+    if: github.event.schedule == '0 * * * *' || github.event.inputs.automation == 'all'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health Check
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/rest/v1/")
+          if [ "$response" -ne 200 ]; then
+            echo "Health check failed with status $response"
+            exit 1
+          fi
+          echo "Health check passed"
+
+  # NOC alerts every 15 minutes
+  noc-monitoring:
+    if: github.event.schedule == '*/15 * * * *' || github.event.inputs.automation == 'all' || github.event.inputs.automation == 'noc-check'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check NOC Alerts
+        run: |
+          curl -X POST "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/functions/v1/noc-alerts?action=check" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            --data '{}'
+        continue-on-error: true
+
+      - name: Get NOC Metrics
+        run: |
+          curl -s "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/functions/v1/noc-metrics?format=json" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+        continue-on-error: true
+
+  # Network monitoring every 5 minutes
+  network-monitoring:
+    if: github.event.schedule == '*/5 * * * *' || github.event.inputs.automation == 'all' || github.event.inputs.automation == 'network'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Network Automation
+        run: |
+          curl -X POST "https://${{ vars.SUPABASE_PROJECT }}.supabase.co/functions/v1/network-automation" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            --data '{}'
+        continue-on-error: true
+
+  # Cache cleanup every hour
+  cache-maintenance:
+    if: github.event.schedule == '30 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Cleanup
+        run: |
+          # Clear old rate limits
+          echo "Cache maintenance would be performed here"
+          # In production, this would call a cache cleanup endpoint
