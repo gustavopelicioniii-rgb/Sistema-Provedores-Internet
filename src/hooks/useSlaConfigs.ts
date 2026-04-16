@@ -1,72 +1,126 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export interface SlaConfig {
   id: string;
   organization_id: string;
-  priority: string;
-  max_response_minutes: number;
-  max_resolution_minutes: number;
+  name: string;
+  response_time_minutes: number;
+  resolution_time_hours: number;
+  priority: "low" | "medium" | "high" | "urgent";
   created_at: string;
-  updated_at: string;
 }
 
-export interface SlaConfigFormData {
-  priority: string;
-  max_response_minutes: number;
-  max_resolution_minutes: number;
-}
-
-async function getOrgId() {
-  const { data, error } = await supabase.from("profiles").select("organization_id").maybeSingle();
-  if (error) throw error;
-  if (!data?.organization_id) throw new Error("Organização não encontrada.");
-  return data.organization_id;
+async function getOrganizationId(): Promise<string | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    
+    const { data } = await supabase
+      .from("profiles")
+      .select("organization_id")
+      .eq("id", user.id)
+      .maybeSingle();
+    
+    return data?.organization_id || null;
+  } catch {
+    return null;
+  }
 }
 
 export function useSlaConfigs() {
   return useQuery({
-    queryKey: ["sla_configs"],
-    queryFn: async () => {
+    queryKey: ["sla-configs"],
+    queryFn: async (): Promise<SlaConfig[]> => {
+      const organizationId = await getOrganizationId();
+      
+      if (!organizationId) {
+        return [];
+      }
+
       const { data, error } = await supabase
-        .from("sla_configs" as any)
+        .from("sla_configs")
         .select("*")
-        .order("priority");
-      if (error) throw error;
-      return (data ?? []) as unknown as SlaConfig[];
+        .eq("organization_id", organizationId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching SLA configs:", error);
+        return [];
+      }
+      
+      return data as SlaConfig[] || [];
     },
   });
 }
 
-export function useUpsertSlaConfig() {
-  const qc = useQueryClient();
-  const { toast } = useToast();
+export function useCreateSlaConfig() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (form: SlaConfigFormData) => {
-      const orgId = await getOrgId();
+    mutationFn: async (values: Partial<SlaConfig>) => {
+      const organizationId = await getOrganizationId();
+      
+      if (!organizationId) {
+        throw new Error("Organização não encontrada");
+      }
+
       const { data, error } = await supabase
-        .from("sla_configs" as any)
-        .upsert(
-          {
-            organization_id: orgId,
-            priority: form.priority,
-            max_response_minutes: form.max_response_minutes,
-            max_resolution_minutes: form.max_resolution_minutes,
-          },
-          { onConflict: "organization_id,priority" }
-        )
+        .from("sla_configs")
+        .insert({
+          ...values,
+          organization_id: organizationId,
+        })
         .select()
         .single();
+
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sla_configs"] });
-      toast({ title: "SLA configurado!" });
+      queryClient.invalidateQueries({ queryKey: ["sla-configs"] });
+      toast.success("Configuração SLA criada");
     },
-    onError: (e: Error) => {
-      toast({ title: "Erro ao configurar SLA", description: e.message, variant: "destructive" });
+    onError: (e: Error) => toast.error("Erro: " + e.message),
+  });
+}
+
+export function useUpdateSlaConfig() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...values }: Partial<SlaConfig> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("sla_configs")
+        .update(values)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sla-configs"] });
+      toast.success("Configuração SLA atualizada");
+    },
+    onError: (e: Error) => toast.error("Erro: " + e.message),
+  });
+}
+
+export function useDeleteSlaConfig() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("sla_configs").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sla-configs"] });
+      toast.success("Configuração SLA excluída");
+    },
+    onError: (e: Error) => toast.error("Erro: " + e.message),
   });
 }

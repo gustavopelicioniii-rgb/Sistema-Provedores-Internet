@@ -79,3 +79,18 @@ CREATE INDEX IF NOT EXISTS idx_ftth_nodes_org ON ftth_nodes(organization_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_org ON user_roles(organization_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_org ON audit_logs(organization_id);
 CREATE INDEX IF NOT EXISTS idx_notification_alerts_org ON notification_alerts(organization_id);
+
+-- financial_transactions table
+CREATE TABLE IF NOT EXISTS financial_transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID NOT NULL,
+    type TEXT NOT NULL,
+    category TEXT,
+    amount DECIMAL NOT NULL,
+    description TEXT,
+    reference_id UUID,
+    reference_type TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_financial_transactions_org ON financial_transactions(organization_id);

@@ -1,113 +1,154 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-export type TicketPriority = "low" | "medium" | "high" | "urgent";
-export type TicketStatus = "open" | "in_progress" | "waiting" | "resolved" | "closed";
-
-export interface TicketFormData {
-  subject: string;
-  description?: string;
-  priority?: TicketPriority;
-  status?: TicketStatus;
-  customer_id?: string;
-  assigned_to?: string;
-}
-
-export interface TicketRecord {
+export interface Ticket {
   id: string;
   organization_id: string;
-  customer_id: string | null;
-  assigned_to: string | null;
+  customer_id?: string;
   subject: string;
-  description: string | null;
-  priority: TicketPriority;
-  status: TicketStatus;
-  resolved_at: string | null;
+  description?: string;
+  status: "open" | "in_progress" | "waiting" | "resolved" | "closed";
+  priority: "low" | "medium" | "high" | "urgent";
+  category?: string;
   created_at: string;
   updated_at: string;
-  customers?: { name: string } | null;
 }
 
-async function getOrgId() {
-  const { data, error } = await supabase.from("profiles").select("organization_id").maybeSingle();
-  if (error) throw error;
-  if (!data?.organization_id) throw new Error("Organização não encontrada.");
-  return data.organization_id;
+async function getOrganizationId(): Promise<string | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    
+    const { data } = await supabase
+      .from("profiles")
+      .select("organization_id")
+      .eq("id", user.id)
+      .maybeSingle();
+    
+    return data?.organization_id || null;
+  } catch {
+    return null;
+  }
 }
 
-export function useTickets(search?: string) {
+export function useTickets(statusFilter?: string[]) {
   return useQuery({
-    queryKey: ["tickets", search],
-    queryFn: async () => {
-      let query = supabase
-        .from("tickets" as any)
-        .select("*, customers:customer_id(name)")
-        .order("created_at", { ascending: false });
-      if (search?.trim()) {
-        query = query.or(`subject.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%`);
+    queryKey: ["tickets", statusFilter],
+    queryFn: async (): Promise<Ticket[]> => {
+      const organizationId = await getOrganizationId();
+      
+      if (!organizationId) {
+        return [];
       }
+
+      let query = supabase
+        .from("tickets")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .order("created_at", { ascending: false });
+
+      if (statusFilter && statusFilter.length > 0) {
+        query = query.in("status", statusFilter);
+      }
+
       const { data, error } = await query;
-      if (error) throw error;
-      return (data ?? []) as unknown as TicketRecord[];
+
+      if (error) {
+        console.error("Error fetching tickets:", error);
+        return [];
+      }
+      
+      return data as Ticket[] || [];
     },
+  });
+}
+
+export function useTicket(id: string) {
+  return useQuery({
+    queryKey: ["ticket", id],
+    queryFn: async (): Promise<Ticket | null> => {
+      if (!id) return null;
+      
+      const { data, error } = await supabase
+        .from("tickets")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as Ticket || null;
+    },
+    enabled: !!id,
   });
 }
 
 export function useCreateTicket() {
-  const qc = useQueryClient();
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (form: TicketFormData) => {
-      const orgId = await getOrgId();
-      const { data, error } = await supabase.from("tickets" as any).insert([{
-        organization_id: orgId,
-        subject: form.subject,
-        description: form.description || null,
-        priority: form.priority || "medium",
-        status: form.status || "open",
-        customer_id: form.customer_id || null,
-        assigned_to: form.assigned_to || null,
-      }]).select().single();
+    mutationFn: async (values: Partial<Ticket>) => {
+      const organizationId = await getOrganizationId();
+      
+      if (!organizationId) {
+        throw new Error("Organização não encontrada");
+      }
+
+      const { data, error } = await supabase
+        .from("tickets")
+        .insert({
+          ...values,
+          organization_id: organizationId,
+        })
+        .select()
+        .single();
+
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tickets"] }); toast({ title: "Ticket criado!" }); },
-    onError: (e: Error) => { toast({ title: "Erro ao criar ticket", description: e.message, variant: "destructive" }); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      toast.success("Ticket criado");
+    },
+    onError: (e: Error) => toast.error("Erro: " + e.message),
   });
 }
 
 export function useUpdateTicket() {
-  const qc = useQueryClient();
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async ({ id, data: form }: { id: string; data: Partial<TicketFormData> }) => {
-      const update: Record<string, unknown> = {};
-      if (form.subject !== undefined) update.subject = form.subject;
-      if (form.description !== undefined) update.description = form.description || null;
-      if (form.priority !== undefined) update.priority = form.priority;
-      if (form.status !== undefined) update.status = form.status;
-      if (form.customer_id !== undefined) update.customer_id = form.customer_id || null;
-      if (form.assigned_to !== undefined) update.assigned_to = form.assigned_to || null;
-      if (form.status === "resolved" || form.status === "closed") update.resolved_at = new Date().toISOString();
-      const { data, error } = await supabase.from("tickets" as any).update(update).eq("id", id).select().single();
+    mutationFn: async ({ id, ...values }: Partial<Ticket> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("tickets")
+        .update(values)
+        .eq("id", id)
+        .select()
+        .single();
+
       if (error) throw error;
       return data;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tickets"] }); toast({ title: "Ticket atualizado!" }); },
-    onError: (e: Error) => { toast({ title: "Erro ao atualizar ticket", description: e.message, variant: "destructive" }); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      toast.success("Ticket atualizado");
+    },
+    onError: (e: Error) => toast.error("Erro: " + e.message),
   });
 }
 
 export function useDeleteTicket() {
-  const qc = useQueryClient();
-  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("tickets" as any).delete().eq("id", id);
+      const { error } = await supabase.from("tickets").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["tickets"] }); toast({ title: "Ticket removido!" }); },
-    onError: (e: Error) => { toast({ title: "Erro ao remover ticket", description: e.message, variant: "destructive" }); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      toast.success("Ticket excluído");
+    },
+    onError: (e: Error) => toast.error("Erro: " + e.message),
   });
 }
